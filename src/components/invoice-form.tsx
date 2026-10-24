@@ -301,7 +301,7 @@ function InvoicePartyCard({
   ].filter(([, value]) => Boolean(value));
 
   return (
-    <section className="min-w-0 border-r-2 border-[#bae6fd] pr-4">
+    <section className="min-w-0 first:pl-4 last:border-r last:border-[#e2e8f0] last:pr-4">
       <h3 className="text-xs font-bold text-[#0369a1]">{title}</h3>
       <p className="mt-2 text-sm font-extrabold text-[#0c4a6e]">
         {party.name || "—"}
@@ -349,9 +349,9 @@ function InvoicePreview({
       <DialogContent
         id="invoice-preview-overlay"
         showCloseButton={false}
-        className="fixed! inset-0 left-0 top-0 z-50 flex w-full max-w-none translate-x-0 translate-y-0 flex-col items-center justify-center gap-0 rounded-none bg-transparent p-3 ring-0 sm:p-6"
+        className="fixed! inset-0! left-0! top-0! z-50! flex! w-full! max-w-none! translate-x-0! translate-y-0! flex-col! items-center! justify-center! gap-0! rounded-none! bg-transparent! p-3! ring-0! sm:p-6! sm:max-w-none!"
       >
-        <section className="my-auto flex max-h-[94vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <section className="my-auto flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
           <div className="flex shrink-0 items-center justify-between border-b border-[#e0f2fe] px-5 py-4 print:hidden">
             <div>
               <DialogTitle
@@ -389,40 +389,27 @@ function InvoicePreview({
               id="invoice-page"
               className="mx-auto min-h-[297mm] w-[210mm] bg-white p-[7mm] shadow-xl max-sm:min-h-0 max-sm:w-full max-sm:p-4 print:min-h-0 print:w-full print:p-0 print:shadow-none"
             >
-              <article id="invoice-print" className="text-right">
-                <header className="flex items-start justify-between gap-6 border-b-2 border-[#0c4a6e] pb-5">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 text-lg font-extrabold text-[#0c4a6e]">
-                      <FileText size={20} className="text-[#0284c7]" />
-                      <span>{values.seller.name || "نام فروشنده"}</span>
-                    </div>
-                    {values.seller.address && (
-                      <p className="mt-2 max-w-md text-xs leading-5 text-[#64748b]">
-                        {values.seller.address}
-                      </p>
-                    )}
-                    {values.seller.phone && (
-                      <p className="mt-1 text-xs text-[#64748b]">
-                        {values.seller.phone}
-                      </p>
-                    )}
-                  </div>
-                  <div className="shrink-0 rounded-lg bg-[#eff8fd] px-4 py-3 text-left">
-                    <p className="text-[10px] font-bold text-[#64748b]">
-                      {values.type}
-                    </p>
-                    <p className="mt-1 text-lg font-black tabular-nums text-[#0369a1]">
+              <article id="invoice-print" className="text-right text-[#1e293b]">
+                <header className="flex items-start justify-between gap-6 border-b border-[#cbd5e1] pb-5 max-sm:gap-3 max-sm:pb-4">
+                  <div className="shrink-0 text-left">
+                    <p className="text-xs text-[#64748b]">شماره فاکتور</p>
+                    <p className="mt-1 text-base font-bold tabular-nums text-[#0369a1] max-sm:text-sm">
                       {values.number}
                     </p>
-                    <p className="mt-1 text-[10px] text-[#475569]">
+                    <p className="mt-2 text-xs text-[#64748b]">
                       تاریخ صدور: {formatInvoiceDate(values.date)}
                     </p>
                   </div>
+                  <div className="min-w-0 text-right">
+                    <h1 className="text-2xl font-black tracking-tight text-[#0c4a6e] max-sm:text-xl">
+                      {values.type || "فاکتور فروش"}
+                    </h1>
+                  </div>
                 </header>
 
-                <div className="my-5 grid grid-cols-2 gap-6 rounded-lg border border-[#e2e8f0] bg-[#fbfdff] p-4 max-sm:gap-3 max-sm:p-3">
-                  <InvoicePartyCard title="خریدار" party={values.buyer} />
+                <div className="my-5 grid grid-cols-2 border-b border-[#e2e8f0] pb-5 max-sm:my-4 max-sm:pb-4">
                   <InvoicePartyCard title="فروشنده" party={values.seller} />
+                  <InvoicePartyCard title="خریدار" party={values.buyer} />
                 </div>
 
                 <table className="w-full table-fixed text-right text-xs max-sm:text-[10px]">
@@ -432,19 +419,19 @@ function InvoicePreview({
                     <col className="w-[20%] max-sm:w-[23.5%]" />
                     <col className="w-[20%] max-sm:w-[23.5%]" />
                   </colgroup>
-                  <thead className="bg-[#eff8fd] text-[#334155]">
+                  <thead className="bg-[#f1f7fb] text-[#334155]">
                     <tr>
-                      <th className="rounded-r-md px-3 py-2.5 font-bold max-sm:px-1.5 max-sm:py-2">
+                      <th className="border-b-2 border-[#0c4a6e] px-3 py-3 font-bold max-sm:px-1.5 max-sm:py-2">
                         شرح کالا / خدمات
                       </th>
-                      <th className="px-2 py-2.5 font-bold max-sm:px-1">
+                      <th className="border-b-2 border-[#0c4a6e] px-2 py-3 font-bold max-sm:px-1 max-sm:py-2">
                         تعداد
                       </th>
-                      <th className="px-2 py-2.5 font-bold max-sm:px-1">
-                        قیمت واحد
+                      <th className="border-b-2 border-[#0c4a6e] px-2 py-3 font-bold max-sm:px-1 max-sm:py-2">
+                        قیمت واحد ({values.currency})
                       </th>
-                      <th className="rounded-l-md px-3 py-2.5 font-bold max-sm:px-1.5 max-sm:py-2">
-                        مبلغ کل
+                      <th className="border-b-2 border-[#0c4a6e] px-3 py-3 font-bold max-sm:px-1.5 max-sm:py-2">
+                        مبلغ کل ({values.currency})
                       </th>
                     </tr>
                   </thead>
@@ -462,9 +449,9 @@ function InvoicePreview({
                       visibleItems.map((item, index) => (
                         <tr
                           key={`${item.name}-${index}`}
-                          className="break-inside-avoid border-b border-[#e2e8f0]"
+                          className="break-inside-avoid border-b border-[#cbd5e1]"
                         >
-                          <td className="px-3 py-3 align-top">
+                          <td className="px-3 py-4 align-top max-sm:px-1.5 max-sm:py-3">
                             <span className="font-bold text-[#1e3a5f]">
                               {item.name || "بدون عنوان"}
                             </span>
@@ -474,19 +461,17 @@ function InvoicePreview({
                               </span>
                             )}
                           </td>
-                          <td className="px-2 py-3 align-top tabular-nums">
+                          <td className="px-2 py-4 align-top tabular-nums max-sm:px-1 max-sm:py-3">
                             {formatMoney(Number(item.quantity) || 0)}
                           </td>
-                          <td className="px-2 py-3 align-top tabular-nums">
-                            {formatMoney(Number(item.unitPrice) || 0)}{" "}
-                            {values.currency}
+                          <td className="px-2 py-4 align-top tabular-nums max-sm:px-1 max-sm:py-3">
+                            {formatMoney(Number(item.unitPrice) || 0)}
                           </td>
-                          <td className="px-3 py-3 align-top font-bold tabular-nums">
+                          <td className="px-3 py-4 align-top font-bold tabular-nums max-sm:px-1.5 max-sm:py-3">
                             {formatMoney(
                               (Number(item.quantity) || 0) *
                                 (Number(item.unitPrice) || 0),
-                            )}{" "}
-                            {values.currency}
+                            )}
                           </td>
                         </tr>
                       ))
@@ -494,29 +479,8 @@ function InvoicePreview({
                   </tbody>
                 </table>
 
-                <div className="mt-5 flex items-start justify-between gap-8 max-sm:flex-col max-sm:gap-4">
-                  <div className="max-w-[90mm] flex-1 max-sm:max-w-none">
-                    {values.notes && (
-                      <section className="rounded-lg bg-[#f8fafc] p-3 text-xs leading-5">
-                        <h3 className="font-bold text-[#334155]">توضیحات</h3>
-                        <p className="mt-1 whitespace-pre-wrap text-[#64748b]">
-                          {values.notes}
-                        </p>
-                      </section>
-                    )}
-                    <div className="mt-5 flex min-h-20 items-end justify-between border-t border-dashed border-[#cbd5e1] pt-3 text-[10px] text-[#64748b]">
-                      <span>مهر و امضای فروشنده</span>
-                      {stampPreview && (
-                        // biome-ignore lint/performance/noImgElement: it is a preview
-                        <img
-                          src={stampPreview}
-                          alt="مهر یا امضای فروشنده"
-                          className="max-h-20 max-w-28 object-contain"
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <div className="w-[78mm] shrink-0 space-y-2 rounded-lg border border-[#e2e8f0] p-3 text-xs max-sm:w-full">
+                <div className="mt-6 flex items-start justify-between gap-8 max-sm:mt-4 max-sm:flex-col max-sm:gap-4">
+                  <div className="w-[78mm] shrink-0 space-y-2 border-t border-[#cbd5e1] pt-3 text-xs max-sm:w-full">
                     <div className="flex justify-between text-[#64748b]">
                       <span>جمع جزء</span>
                       <span className="tabular-nums">
@@ -539,18 +503,38 @@ function InvoicePreview({
                         </span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between border-t border-[#dbeafe] pt-2 font-extrabold text-[#0369a1]">
+                    <div className="flex items-center justify-between border-t-2 border-[#0c4a6e] bg-[#eff8fd] px-3 py-3 font-extrabold text-[#0c4a6e]">
                       <span>مبلغ قابل پرداخت</span>
                       <span className="text-base tabular-nums">
                         {formatMoney(total)} {values.currency}
                       </span>
                     </div>
                   </div>
+                  <div className="max-w-[90mm] flex-1 max-sm:max-w-none">
+                    {values.notes && (
+                      <section className="border-r-2 border-[#bae6fd] pr-3 text-xs leading-5">
+                        <h3 className="font-bold text-[#334155]">توضیحات</h3>
+                        <p className="mt-1 whitespace-pre-wrap text-[#64748b]">
+                          {values.notes}
+                        </p>
+                      </section>
+                    )}
+                    <div className="mt-5 flex min-h-20 items-end justify-between border-t border-dashed border-[#cbd5e1] pt-3 text-[10px] text-[#64748b]">
+                      <span>مهر و امضای فروشنده</span>
+                      {stampPreview && (
+                        // biome-ignore lint/performance/noImgElement: it is a preview
+                        <img
+                          src={stampPreview}
+                          alt="مهر یا امضای فروشنده"
+                          className="max-h-20 max-w-28 object-contain"
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                <footer className="mt-5 flex items-center justify-between border-t border-[#e2e8f0] pt-3 text-[10px] text-[#64748b]">
-                  <span>از انتخاب شما سپاسگزاریم.</span>
-                  <span>فاکتور {values.number}</span>
+                <footer className="mt-6 border-t border-[#cbd5e1] pt-4 text-center text-[10px] text-[#0369a1] max-sm:mt-4 max-sm:pt-3">
+                  <p className="font-bold">از اعتماد شما سپاسگزاریم.</p>
                 </footer>
               </article>
             </div>
