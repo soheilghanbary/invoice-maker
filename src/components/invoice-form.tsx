@@ -422,13 +422,13 @@ function InvoicePreview({
                       <th className="px-3 py-3 font-bold max-sm:px-1.5 max-sm:py-2">
                         شرح کالا / خدمات
                       </th>
-                      <th className="px-2 py-3 font-bold max-sm:px-1 max-sm:py-2">
+                      <th className="px-2 py-3 text-center font-bold max-sm:px-1 max-sm:py-2">
                         تعداد
                       </th>
-                      <th className="px-2 py-3 font-bold max-sm:px-1 max-sm:py-2">
+                      <th className="px-2 py-3 text-center font-bold max-sm:px-1 max-sm:py-2">
                         قیمت واحد ({values.currency})
                       </th>
-                      <th className="px-3 py-3 font-bold max-sm:px-1.5 max-sm:py-2">
+                      <th className="px-3 py-3 text-center font-bold max-sm:px-1.5 max-sm:py-2">
                         مبلغ کل ({values.currency})
                       </th>
                     </tr>
@@ -459,13 +459,13 @@ function InvoicePreview({
                               </span>
                             )}
                           </td>
-                          <td className="px-2 py-4 align-top tabular-nums max-sm:px-1 max-sm:py-3">
+                          <td className="px-2 py-4 text-center align-top tabular-nums max-sm:px-1 max-sm:py-3">
                             {formatMoney(Number(item.quantity) || 0)}
                           </td>
-                          <td className="px-2 py-4 align-top tabular-nums max-sm:px-1 max-sm:py-3">
+                          <td className="px-2 py-4 text-center align-top tabular-nums max-sm:px-1 max-sm:py-3">
                             {formatMoney(Number(item.unitPrice) || 0)}
                           </td>
-                          <td className="px-3 py-4 align-top font-bold tabular-nums max-sm:px-1.5 max-sm:py-3">
+                          <td className="px-3 py-4 text-center align-top font-bold tabular-nums max-sm:px-1.5 max-sm:py-3">
                             {formatMoney(
                               (Number(item.quantity) || 0) *
                                 (Number(item.unitPrice) || 0),
@@ -477,7 +477,7 @@ function InvoicePreview({
                   </tbody>
                 </table>
 
-                <div className="mt-6 flex items-start justify-between gap-8 max-sm:mt-4 max-sm:flex-col max-sm:gap-4">
+                <div className="mt-6 flex items-start justify-between gap-8 max-sm:mt-4 max-sm:flex-col max-sm:gap-4 print:grid print:grid-cols-2 print:gap-x-6">
                   <div className="w-[78mm] shrink-0 space-y-2 text-xs max-sm:w-full">
                     <div className="flex justify-between text-[#64748b]">
                       <span>جمع جزء</span>
@@ -510,7 +510,7 @@ function InvoicePreview({
                   </div>
                   <div className="max-w-[90mm] flex-1 max-sm:max-w-none">
                     {values.notes && (
-                      <section className="border-r-2 border-[#bae6fd] pr-3 text-xs leading-5">
+                      <section className="border-r-2 border-[#5bb5e9] pr-3 text-xs leading-5">
                         <h3 className="font-bold text-[#334155]">توضیحات</h3>
                         <p className="mt-1 whitespace-pre-wrap text-[#64748b]">
                           {values.notes}
@@ -523,7 +523,7 @@ function InvoicePreview({
                         <img
                           src={stampPreview}
                           alt="مهر یا امضای فروشنده"
-                          className="size-40 object-contain mr-auto pl-4"
+                          className="max-h-[28mm] max-w-[30mm] object-contain mr-auto pl-4"
                         />
                       )}
                       <span className="text-left mr-auto pl-4">
