@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "typecheck": "tsc --noEmit",
+    "fmt": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome check --write"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

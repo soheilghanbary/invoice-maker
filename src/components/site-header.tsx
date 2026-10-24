@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ArrowUpLeft, FileText } from "lucide-react";
+import Link from "next/link";
 
 const navItems = [
   { label: "خانه", href: "#home" },
@@ -10,15 +10,24 @@ const navItems = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-[#e2e8f0] bg-[#f8fbfd]/90 backdrop-blur-md">
-      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="#home" className="flex items-center gap-3" aria-label="فاکتورینو، خانه">
+      <div className="mx-auto flex h-19 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12">
+        <Link
+          href="#home"
+          className="flex items-center gap-3"
+          aria-label="فاکتورینو، خانه"
+        >
           <span className="flex size-10 items-center justify-center rounded-xl bg-[#0369a1] text-[#bae6fd]">
             <FileText size={19} strokeWidth={1.8} />
           </span>
-          <span className="text-[17px] font-extrabold tracking-tight text-[#0c4a6e]">فاکتورینو</span>
+          <span className="text-[17px] font-extrabold tracking-tight text-[#0c4a6e]">
+            فاکتورینو
+          </span>
         </Link>
 
-        <nav aria-label="ناوبری اصلی" className="hidden items-center gap-9 md:flex">
+        <nav
+          aria-label="ناوبری اصلی"
+          className="hidden items-center gap-9 md:flex"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
