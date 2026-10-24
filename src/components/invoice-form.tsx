@@ -84,7 +84,7 @@ type InvoiceValues = {
 };
 
 const defaultValues: InvoiceValues = {
-  type: "فاکتور فروش",
+  type: "پیش فاکتور",
   number: "۱۴۰۵-۱۰۰۱",
   date: "2026-10-24",
   currency: "ریال",
@@ -924,7 +924,7 @@ export function InvoiceForm() {
                 <SelectField
                   label="نوع فاکتور"
                   name="type"
-                  options={["فاکتور فروش", "فاکتور خدمات", "پیش‌فاکتور"]}
+                  options={["فاکتور فروش", "فاکتور خدمات", "پیش فاکتور"]}
                   control={control}
                 />
                 <Field label="شماره فاکتور">
