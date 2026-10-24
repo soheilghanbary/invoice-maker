@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "skills": {
+    "codebase-design": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/codebase-design/SKILL.md",
+      "computedHash": "b2888e4f4e8c0af3bfd557575a64b905c44e6248c3101d72077816882b3a92b9"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
+    },
+    "ios-design": {
+      "source": "uizze.sh",
+      "sourceUrl": "https://uizze.sh/",
+      "sourceType": "well-known",
+      "computedHash": "5db10aea0f95d69a54cabcfae129ea0e7069b7022de967b2a04acdd9fa1be050",
+      "wellKnownDigest": "sha256:8db9f7cafeda65751e88fcbc1c9e4fc3f93803a438c30fe8e3fc8b00773417bd"
+    },
+    "ui-taste": {
+      "source": "uizze.sh",
+      "sourceUrl": "https://uizze.sh/",
+      "sourceType": "well-known",
+      "computedHash": "b9d9f1f68d2db3316639cf77ad74dae34a2ed2ffb90845e5de6c592095c78a3d",
+      "wellKnownDigest": "sha256:120fd3e899db255454fff61b7e8c22757524ffe31101a22d19346708bd20c4b9"
+    }
+  }
+}
