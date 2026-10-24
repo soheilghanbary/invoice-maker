@@ -122,7 +122,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground scroll-smooth;
   }
   html {
     @apply font-sans;
@@ -130,7 +130,7 @@
   html,
   body {
     max-width: 100%;
-    overflow-x: clip !important;
+    overflow-x: clip;
   }
 }
 
@@ -143,66 +143,66 @@
   html,
   body {
     width: 196mm;
-    min-height: 0 !important;
-    height: auto !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    background: #ffffff !important;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    overflow: hidden;
+    background: #ffffff;
   }
 
   body * {
-    visibility: hidden !important;
+    visibility: hidden;
   }
 
   #invoice-app {
     width: 100%;
-    min-height: 0 !important;
-    background: #ffffff !important;
+    min-height: 0;
+    background: #ffffff;
   }
 
   #invoice-app > header,
   #invoice-app > main {
-    display: none !important;
+    display: none;
   }
 
   #invoice-preview-overlay {
-    position: static !important;
-    inset: auto !important;
-    display: block !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
+    position: static;
+    inset: auto;
+    display: block;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
   }
 
   #invoice-preview-overlay > section {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-    max-height: none !important;
-    overflow: visible !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    display: block;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   #invoice-page {
-    width: 100% !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
+    width: 100%;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
   }
 
   #invoice-print,
   #invoice-print * {
-    visibility: visible !important;
+    visibility: visible;
   }
 
   #invoice-print {
     position: relative;
     width: var(--invoice-print-width, 100%);
-    padding: 0 !important;
-    color-adjust: exact;
+    padding: 0;
+    accent-color: exact;
     print-color-adjust: exact;
     zoom: var(--invoice-print-scale, 1);
     break-inside: avoid;
