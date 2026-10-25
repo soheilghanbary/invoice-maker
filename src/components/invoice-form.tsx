@@ -523,7 +523,7 @@ function InvoicePreview({
                         <img
                           src={stampPreview}
                           alt="مهر یا امضای فروشنده"
-                          className="max-h-[28mm] max-w-[30mm] object-contain mr-auto pl-4"
+                          className="max-h-[36mm] max-w-[40mm] size-36 object-contain mr-auto pl-4"
                         />
                       )}
                       <span className="text-left mr-auto pl-4">
