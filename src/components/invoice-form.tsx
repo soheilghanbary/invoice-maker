@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import {
   type Control,
   Controller,
@@ -79,6 +79,7 @@ type InvoiceValues = {
   };
   items: InvoiceItem[];
   notes: string;
+  stampPreview: string;
   discount: number;
   taxEnabled: boolean;
 };
@@ -106,6 +107,7 @@ const defaultValues: InvoiceValues = {
   },
   items: [{ name: "", description: "", quantity: 1, unitPrice: 0 }],
   notes: "",
+  stampPreview: "",
   discount: 0,
   taxEnabled: false,
 };
@@ -115,6 +117,22 @@ const moneyFormat = new Intl.NumberFormat("fa-IR", {
 });
 const formatMoney = (value: number) =>
   moneyFormat.format(Math.max(0, Math.round(value)));
+
+function calculateTotals(
+  items: InvoiceItem[],
+  discountValue: number,
+  taxEnabled: boolean,
+) {
+  const subtotal = items.reduce(
+    (sum, item) =>
+      sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
+    0,
+  );
+  const discount = Math.min(subtotal, Math.max(0, Number(discountValue) || 0));
+  const taxableSubtotal = Math.max(0, subtotal - discount);
+  const tax = taxEnabled ? taxableSubtotal * 0.1 : 0;
+  return { subtotal, discount, tax, total: taxableSubtotal + tax };
+}
 
 function parseInvoiceDate(value: string) {
   const [year, month, day] = value.split("-").map(Number);
@@ -263,22 +281,32 @@ function PartyFields({
           </p>
         </div>
       </div>
-      <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-2">
         {fields.map((field) => (
-          <Field
+          <div
             key={field.key}
-            label={field.label}
-            required={"required" in field && field.required}
+            className={
+              field.key === "nationalId" || field.key === "economicCode"
+                ? "col-span-1"
+                : "col-span-2 sm:col-span-1"
+            }
           >
-            <Input
-              {...register(`${name}.${field.key}` as const)}
-              type={"type" in field ? field.type : "text"}
-              placeholder={field.placeholder}
-              dir={
-                field.key === "address" || field.key === "name" ? "rtl" : "auto"
-              }
-            />
-          </Field>
+            <Field
+              label={field.label}
+              required={"required" in field && field.required}
+            >
+              <Input
+                {...register(`${name}.${field.key}` as const)}
+                type={"type" in field ? field.type : "text"}
+                placeholder={field.placeholder}
+                dir={
+                  field.key === "address" || field.key === "name"
+                    ? "rtl"
+                    : "auto"
+                }
+              />
+            </Field>
+          </div>
         ))}
       </div>
     </section>
@@ -320,25 +348,22 @@ function InvoicePartyCard({
 
 function InvoicePreview({
   open,
-  values,
-  subtotal,
-  discount,
-  tax,
-  total,
-  stampPreview,
+  control,
   onPrint,
   onClose,
 }: {
   open: boolean;
-  values: InvoiceValues;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-  stampPreview: string;
+  control: Control<InvoiceValues>;
   onPrint: () => void;
   onClose: () => void;
 }) {
+  const values = useWatch({ control }) as InvoiceValues;
+  const stampPreview = values.stampPreview;
+  const { subtotal, discount, tax, total } = calculateTotals(
+    values.items,
+    values.discount,
+    values.taxEnabled,
+  );
   const visibleItems = values.items.filter(
     (item) =>
       item.name.trim() || item.description.trim() || Number(item.unitPrice) > 0,
@@ -547,16 +572,14 @@ function InvoicePreview({
 function InvoiceItemsSection({
   control,
   register,
-  items,
-  subtotal,
-  currency,
 }: {
   control: Control<InvoiceValues>;
   register: UseFormRegister<InvoiceValues>;
-  items: InvoiceItem[];
-  subtotal: number;
-  currency: InvoiceValues["currency"];
 }) {
+  const items = useWatch({ control, name: "items" }) ?? defaultValues.items;
+  const currency =
+    useWatch({ control, name: "currency" }) ?? defaultValues.currency;
+  const subtotal = calculateTotals(items, 0, false).subtotal;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -752,6 +775,145 @@ function MountedInvoiceItems({
   );
 }
 
+function InvoiceSummary({
+  control,
+  register,
+  onPreview,
+}: {
+  control: Control<InvoiceValues>;
+  register: UseFormRegister<InvoiceValues>;
+  onPreview: () => void;
+}) {
+  const items = useWatch({ control, name: "items" }) ?? defaultValues.items;
+  const discountValue = useWatch({ control, name: "discount" }) ?? 0;
+  const taxEnabled = useWatch({ control, name: "taxEnabled" }) ?? false;
+  const currency =
+    useWatch({ control, name: "currency" }) ?? defaultValues.currency;
+  const totals = calculateTotals(items, discountValue, taxEnabled);
+
+  return (
+    <aside className="sticky top-22 rounded-2xl border border-[#dbeafe] bg-white p-5 shadow-[0_10px_35px_rgba(42,57,46,0.045)] print:hidden">
+      <div className="mb-5 flex items-center gap-2.5">
+        <span className="flex size-9 items-center justify-center rounded-xl bg-[#f0f9ff] text-[#0284c7]">
+          <ReceiptText size={17} />
+        </span>
+        <h2 className="font-extrabold text-[#0c4a6e]">خلاصه فاکتور</h2>
+      </div>
+      <div className="space-y-4 border-b border-[#e0f2fe] pb-5 text-sm">
+        <div className="flex justify-between text-[#64748b]">
+          <span>جمع جزء</span>
+          <span className="font-semibold tabular-nums text-[#475569]">
+            {formatMoney(totals.subtotal)}
+          </span>
+        </div>
+        <Field label="تخفیف">
+          <div className="relative">
+            <Input
+              {...register("discount", { valueAsNumber: true })}
+              type="number"
+              min="0"
+              step="1"
+              placeholder="۰"
+              className="pl-14 text-left tabular-nums"
+              dir="ltr"
+            />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#64748b]">
+              {currency}
+            </span>
+          </div>
+        </Field>
+        <Controller
+          control={control}
+          name="taxEnabled"
+          render={({ field }) => (
+            <Label className="flex cursor-pointer items-center justify-between rounded-xl bg-[#f8fbfd] px-3.5 py-3">
+              <span>
+                <span className="block text-sm font-semibold text-[#475569]">
+                  مالیات بر ارزش افزوده
+                </span>
+                <span className="mt-1 block text-xs text-[#64748b]">
+                  محاسبه ۱۰٪ روی مبلغ پس از تخفیف
+                </span>
+              </span>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                name={field.name}
+              />
+            </Label>
+          )}
+        />
+        {taxEnabled && (
+          <div className="flex justify-between text-sm text-[#64748b]">
+            <span>مالیات (۱۰٪)</span>
+            <span className="font-semibold tabular-nums text-[#475569]">
+              {formatMoney(totals.tax)}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="flex items-end justify-between py-5">
+        <span className="text-sm font-bold text-[#334155]">قابل پرداخت</span>
+        <span className="text-left">
+          <strong className="block text-xl font-extrabold tabular-nums text-[#0369a1]">
+            {formatMoney(totals.total)}
+          </strong>
+          <span className="mt-1 block text-xs text-[#64748b]">{currency}</span>
+        </span>
+      </div>
+      <Button
+        type="button"
+        size="lg"
+        onClick={onPreview}
+        className="w-full gap-2"
+      >
+        <FileText size={16} /> پیش‌نمایش فاکتور
+      </Button>
+      <p className="mt-3 text-center text-[11px] leading-5 text-[#64748b]">
+        <Check size={12} className="mr-1 inline text-[#0284c7]" /> چاپ یا ذخیره
+        مستقیم به صورت PDF
+      </p>
+    </aside>
+  );
+}
+
+function SellerProfilePersistence({
+  control,
+  setValue,
+}: {
+  control: Control<InvoiceValues>;
+  setValue: ReturnType<typeof useForm<InvoiceValues>>["setValue"];
+}) {
+  const seller = useWatch({ control, name: "seller" });
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(
+        "factorino-next-seller-profile",
+      );
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<InvoiceValues["seller"]>;
+        setValue("seller", { ...defaultValues.seller, ...parsed });
+      }
+    } catch {
+      setValue("seller", defaultValues.seller);
+    }
+    setReady(true);
+  }, [setValue]);
+
+  useEffect(() => {
+    if (ready && seller) {
+      window.localStorage.setItem(
+        "factorino-next-seller-profile",
+        JSON.stringify(seller),
+      );
+    }
+  }, [ready, seller]);
+
+  return null;
+}
+
 export function InvoiceForm() {
   const { register, control, setValue } = useForm<InvoiceValues>({
     defaultValues,
@@ -759,13 +921,9 @@ export function InvoiceForm() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [stampName, setStampName] = useState("");
-  const [stampPreview, setStampPreview] = useState("");
   const [timeZone, setTimeZone] = useState<string>();
-  const [sellerStorageReady, setSellerStorageReady] = useState(false);
-  const values = useWatch({
-    control,
-    defaultValue: defaultValues,
-  }) as InvoiceValues;
+  const stampPreviewUrl = useRef("");
+  const invoiceNumberInitialized = useRef(false);
 
   useEffect(() => {
     startTransition(() => {
@@ -773,14 +931,9 @@ export function InvoiceForm() {
     });
   }, []);
 
-  useEffect(
-    () => () => {
-      if (stampPreview) URL.revokeObjectURL(stampPreview);
-    },
-    [stampPreview],
-  );
-
   useEffect(() => {
+    if (invoiceNumberInitialized.current) return;
+    invoiceNumberInitialized.current = true;
     const storageKey = "factorino-next-invoice-number";
     const next = Number(window.localStorage.getItem(storageKey) || "1001");
     setValue(
@@ -790,46 +943,12 @@ export function InvoiceForm() {
     window.localStorage.setItem(storageKey, String(next + 1));
   }, [setValue]);
 
-  useEffect(() => {
-    try {
-      const storedSeller = window.localStorage.getItem(
-        "factorino-next-seller-profile",
-      );
-      if (storedSeller) {
-        const parsedSeller = JSON.parse(storedSeller) as Partial<
-          InvoiceValues["seller"]
-        >;
-        setValue("seller", { ...defaultValues.seller, ...parsedSeller });
-      }
-    } catch {
-      setValue("seller", defaultValues.seller);
-    }
-    setSellerStorageReady(true);
-  }, [setValue]);
-
-  useEffect(() => {
-    if (!sellerStorageReady) return;
-    window.localStorage.setItem(
-      "factorino-next-seller-profile",
-      JSON.stringify(values.seller),
-    );
-  }, [sellerStorageReady, values.seller]);
-
-  const totals = useMemo(() => {
-    const subtotal =
-      values.items?.reduce(
-        (sum, item) =>
-          sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
-        0,
-      ) || 0;
-    const discount = Math.min(
-      subtotal,
-      Math.max(0, Number(values.discount) || 0),
-    );
-    const taxableSubtotal = Math.max(0, subtotal - discount);
-    const tax = values.taxEnabled ? taxableSubtotal * 0.1 : 0;
-    return { subtotal, discount, tax, total: taxableSubtotal + tax };
-  }, [values.items, values.discount, values.taxEnabled]);
+  useEffect(
+    () => () => {
+      if (stampPreviewUrl.current) URL.revokeObjectURL(stampPreviewUrl.current);
+    },
+    [],
+  );
 
   const printInvoice = () => {
     const sheet = document.getElementById("invoice-print");
@@ -853,6 +972,7 @@ export function InvoiceForm() {
 
   return (
     <div id="invoice-app" className="min-h-screen bg-[#f0f9ff]">
+      <SellerProfilePersistence control={control} setValue={setValue} />
       <header className="sticky top-0 z-20 border-b border-[#dbeafe] bg-[#f8fbfd]/95 backdrop-blur print:hidden">
         <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-4 sm:px-8 lg:px-12">
           <Link
@@ -999,13 +1119,7 @@ export function InvoiceForm() {
               register={register}
             />
 
-            <InvoiceItemsSection
-              control={control}
-              register={register}
-              items={values.items}
-              subtotal={totals.subtotal}
-              currency={values.currency}
-            />
+            <InvoiceItemsSection control={control} register={register} />
 
             <div className="grid gap-5 md:grid-cols-2">
               <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-6">
@@ -1050,7 +1164,12 @@ export function InvoiceForm() {
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       setStampName(file?.name || "");
-                      setStampPreview(file ? URL.createObjectURL(file) : "");
+                      if (stampPreviewUrl.current) {
+                        URL.revokeObjectURL(stampPreviewUrl.current);
+                      }
+                      const preview = file ? URL.createObjectURL(file) : "";
+                      stampPreviewUrl.current = preview;
+                      setValue("stampPreview", preview);
                     }}
                   />
                 </label>
@@ -1058,118 +1177,18 @@ export function InvoiceForm() {
             </div>
           </div>
 
-          <aside className="sticky top-22 rounded-2xl border border-[#dbeafe] bg-white p-5 shadow-[0_10px_35px_rgba(42,57,46,0.045)] print:hidden">
-            <div className="mb-5 flex items-center gap-2.5">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-[#f0f9ff] text-[#0284c7]">
-                <ReceiptText size={17} />
-              </span>
-              <h2 className="font-extrabold text-[#0c4a6e]">خلاصه فاکتور</h2>
-            </div>
-            <div className="space-y-4 border-b border-[#e0f2fe] pb-5 text-sm">
-              <div className="flex justify-between text-[#64748b]">
-                <span>جمع جزء</span>
-                <span className="font-semibold tabular-nums text-[#475569]">
-                  {formatMoney(totals.subtotal)}
-                </span>
-              </div>
-              <Field label="تخفیف">
-                <div className="relative">
-                  <Input
-                    {...register("discount", { valueAsNumber: true })}
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="۰"
-                    className="pl-14 text-left tabular-nums"
-                    dir="ltr"
-                  />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#64748b]">
-                    {values.currency}
-                  </span>
-                </div>
-              </Field>
-              <Controller
-                control={control}
-                name="taxEnabled"
-                render={({ field }) => (
-                  <Label className="flex cursor-pointer items-center justify-between rounded-xl bg-[#f8fbfd] px-3.5 py-3">
-                    <span>
-                      <span className="block text-sm font-semibold text-[#475569]">
-                        مالیات بر ارزش افزوده
-                      </span>
-                      <span className="mt-1 block text-xs text-[#64748b]">
-                        محاسبه ۱۰٪ روی مبلغ پس از تخفیف
-                      </span>
-                    </span>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      name={field.name}
-                    />
-                  </Label>
-                )}
-              />
-              {values.taxEnabled && (
-                <div className="flex justify-between text-sm text-[#64748b]">
-                  <span>مالیات (۱۰٪)</span>
-                  <span className="font-semibold tabular-nums text-[#475569]">
-                    {formatMoney(totals.tax)}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-end justify-between py-5">
-              <span className="text-sm font-bold text-[#334155]">
-                قابل پرداخت
-              </span>
-              <span className="text-left">
-                <strong className="block text-xl font-extrabold tabular-nums text-[#0369a1]">
-                  {formatMoney(totals.total)}
-                </strong>
-                <span className="mt-1 block text-xs text-[#64748b]">
-                  {values.currency}
-                </span>
-              </span>
-            </div>
-            <Button
-              type="button"
-              size="lg"
-              onClick={() => setPreviewOpen(true)}
-              className="hidden w-full gap-2 lg:flex"
-            >
-              <FileText size={16} /> پیش‌نمایش فاکتور
-            </Button>
-            <p className="mt-3 text-center text-[11px] leading-5 text-[#64748b]">
-              <Check size={12} className="mr-1 inline text-[#0284c7]" /> چاپ یا
-              ذخیره مستقیم به صورت PDF
-            </p>
-          </aside>
+          <InvoiceSummary
+            control={control}
+            register={register}
+            onPreview={() => setPreviewOpen(true)}
+          />
         </form>
       </main>
-
-      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-[#dbeafe] bg-white/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(12,74,110,0.08)] backdrop-blur print:hidden lg:hidden">
-        <div className="min-w-0">
-          <span className="block text-xs text-[#64748b]">قابل پرداخت</span>
-          <span className="mt-0.5 flex items-baseline gap-1.5 font-extrabold tabular-nums text-[#0369a1]">
-            <span className="text-lg">{formatMoney(totals.total)}</span>
-            <span className="text-xs font-semibold">{values.currency}</span>
-          </span>
-        </div>
-        <Button
-          type="button"
-          onClick={() => setPreviewOpen(true)}
-          className="shrink-0 gap-2"
-        >
-          <FileText size={16} /> پیش‌نمایش و چاپ
-        </Button>
-      </div>
 
       {previewOpen && (
         <InvoicePreview
           open={previewOpen}
-          values={values}
-          stampPreview={stampPreview}
-          {...totals}
+          control={control}
           onPrint={printInvoice}
           onClose={() => setPreviewOpen(false)}
         />
