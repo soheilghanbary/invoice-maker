@@ -24,6 +24,7 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form";
+import { getInvoice, saveInvoice } from "@/lib/invoice-storage";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -48,41 +49,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
-type InvoiceItem = {
-  name: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-};
-
-type InvoiceValues = {
-  type: string;
-  number: string;
-  date: string;
-  currency: "تومان" | "ریال";
-  seller: {
-    name: string;
-    phone: string;
-    address: string;
-    postalCode: string;
-    nationalId: string;
-    economicCode: string;
-  };
-  buyer: {
-    name: string;
-    phone: string;
-    address: string;
-    postalCode: string;
-    nationalId: string;
-    economicCode: string;
-  };
-  items: InvoiceItem[];
-  notes: string;
-  stampPreview: string;
-  discount: number;
-  taxEnabled: boolean;
-};
+import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
 
 const defaultValues: InvoiceValues = {
   type: "پیش فاکتور",
@@ -779,10 +746,16 @@ function InvoiceSummary({
   control,
   register,
   onPreview,
+  saving,
+  loading,
+  isEditing,
 }: {
   control: Control<InvoiceValues>;
   register: UseFormRegister<InvoiceValues>;
   onPreview: () => void;
+  saving: boolean;
+  loading: boolean;
+  isEditing: boolean;
 }) {
   const items = useWatch({ control, name: "items" }) ?? defaultValues.items;
   const discountValue = useWatch({ control, name: "discount" }) ?? 0;
@@ -862,10 +835,26 @@ function InvoiceSummary({
         </span>
       </div>
       <Button
+        type="submit"
+        size="lg"
+        disabled={saving || loading}
+        className="mb-2 w-full gap-2"
+      >
+        <Check size={16} />{" "}
+        {loading
+          ? "در حال بارگذاری..."
+          : saving
+          ? "در حال ذخیره..."
+          : isEditing
+            ? "ذخیره تغییرات"
+            : "ذخیره فاکتور"}
+      </Button>
+      <Button
         type="button"
         size="lg"
         onClick={onPreview}
         className="w-full gap-2"
+        variant={"secondary"}
       >
         <FileText size={16} /> پیش‌نمایش فاکتور
       </Button>
@@ -880,14 +869,17 @@ function InvoiceSummary({
 function SellerProfilePersistence({
   control,
   setValue,
+  enabled = true,
 }: {
   control: Control<InvoiceValues>;
   setValue: ReturnType<typeof useForm<InvoiceValues>>["setValue"];
+  enabled?: boolean;
 }) {
   const seller = useWatch({ control, name: "seller" });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     try {
       const stored = window.localStorage.getItem(
         "factorino-next-seller-profile",
@@ -900,24 +892,34 @@ function SellerProfilePersistence({
       setValue("seller", defaultValues.seller);
     }
     setReady(true);
-  }, [setValue]);
+  }, [enabled, setValue]);
 
   useEffect(() => {
-    if (ready && seller) {
+    if (enabled && ready && seller) {
       window.localStorage.setItem(
         "factorino-next-seller-profile",
         JSON.stringify(seller),
       );
     }
-  }, [ready, seller]);
+  }, [enabled, ready, seller]);
 
   return null;
 }
 
-export function InvoiceForm() {
-  const { register, control, setValue } = useForm<InvoiceValues>({
-    defaultValues,
-  });
+export function InvoiceForm({
+  invoiceId,
+  showPreview = false,
+}: {
+  invoiceId?: number;
+  showPreview?: boolean;
+}) {
+  const { register, control, setValue, handleSubmit, getValues, reset } =
+    useForm<InvoiceValues>({
+      defaultValues,
+    });
+  const [loadingInvoice, setLoadingInvoice] = useState(Boolean(invoiceId));
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [stampName, setStampName] = useState("");
@@ -932,6 +934,39 @@ export function InvoiceForm() {
   }, []);
 
   useEffect(() => {
+    if (!invoiceId) return;
+    let active = true;
+    getInvoice(invoiceId)
+      .then((invoice) => {
+        if (!active) return;
+        if (!invoice) {
+          setSaveError("این فاکتور در این مرورگر پیدا نشد.");
+          return;
+        }
+        reset({
+          ...defaultValues,
+          ...invoice.payload,
+          seller: { ...defaultValues.seller, ...invoice.payload.seller },
+          buyer: { ...defaultValues.buyer, ...invoice.payload.buyer },
+        });
+        if (showPreview) setPreviewOpen(true);
+      })
+      .catch(() => {
+        if (active) setSaveError("بارگذاری فاکتور انجام نشد.");
+      })
+      .finally(() => {
+        if (active) setLoadingInvoice(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [invoiceId, reset, showPreview]);
+
+  useEffect(() => {
+    if (invoiceId) {
+      invoiceNumberInitialized.current = true;
+      return;
+    }
     if (invoiceNumberInitialized.current) return;
     invoiceNumberInitialized.current = true;
     const storageKey = "factorino-next-invoice-number";
@@ -941,7 +976,7 @@ export function InvoiceForm() {
       `۱۴۰۵-${new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(next)}`,
     );
     window.localStorage.setItem(storageKey, String(next + 1));
-  }, [setValue]);
+  }, [setValue, invoiceId]);
 
   useEffect(
     () => () => {
@@ -970,9 +1005,28 @@ export function InvoiceForm() {
     window.print();
   };
 
+  const persistInvoice = async () => {
+    setSaving(true);
+    setSaveError("");
+    try {
+      await saveInvoice(getValues(), invoiceId);
+      window.location.assign("/invoices");
+    } catch (error) {
+      setSaveError(
+        error instanceof Error ? error.message : "ذخیره فاکتور انجام نشد.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div id="invoice-app" className="min-h-screen bg-[#f0f9ff]">
-      <SellerProfilePersistence control={control} setValue={setValue} />
+      <SellerProfilePersistence
+        control={control}
+        setValue={setValue}
+        enabled={!invoiceId}
+      />
       <header className="sticky top-0 z-20 border-b border-[#dbeafe] bg-[#f8fbfd]/95 backdrop-blur print:hidden">
         <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-4 sm:px-8 lg:px-12">
           <Link
@@ -985,11 +1039,17 @@ export function InvoiceForm() {
             فاکتورینو
           </Link>
           <div className="flex items-center gap-3">
+            <Link
+              href="/invoices"
+              className="text-sm font-semibold text-[#0369a1] hover:text-[#0c4a6e]"
+            >
+              فاکتورهای من
+            </Link>
             <span className="hidden text-sm text-[#64748b] sm:inline">
-              پیش‌نویس فاکتور
+              {invoiceId ? "ویرایش فاکتور" : "پیش‌نویس فاکتور"}
             </span>
             <span className="rounded-lg bg-[#e0f2fe] px-3 py-1.5 text-xs font-bold text-[#0369a1]">
-              پیش‌نویس
+              {invoiceId ? "در حال ویرایش" : "پیش‌نویس"}
             </span>
           </div>
         </div>
@@ -1022,7 +1082,7 @@ export function InvoiceForm() {
         </div>
 
         <form
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={handleSubmit(persistInvoice)}
           className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_310px]"
         >
           <div className="space-y-5">
@@ -1181,8 +1241,16 @@ export function InvoiceForm() {
             control={control}
             register={register}
             onPreview={() => setPreviewOpen(true)}
+            saving={saving}
+            loading={loadingInvoice}
+            isEditing={Boolean(invoiceId)}
           />
         </form>
+        {saveError && (
+          <p role="alert" className="mt-4 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
       </main>
 
       {previewOpen && (

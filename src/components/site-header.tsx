@@ -5,6 +5,7 @@ const navItems = [
   { label: "خانه", href: "#home" },
   { label: "امکانات", href: "#features" },
   { label: "نمونه فاکتور", href: "#invoice-preview" },
+  { label: "فاکتورهای من", href: "/invoices" },
 ];
 
 export function SiteHeader() {
