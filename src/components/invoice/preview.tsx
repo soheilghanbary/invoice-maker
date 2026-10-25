@@ -1,12 +1,21 @@
 "use client";
 
-import { Printer, X } from 'lucide-react';
-import { useWatch, type Control } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { InvoicePartyCard } from '@/components/invoice/fields';
-import { calculateTotals, formatInvoiceDate, formatMoney } from '@/components/invoice/model';
-import type { InvoiceValues } from '@/types/invoice';
+import { Printer, X } from "lucide-react";
+import { type Control, useWatch } from "react-hook-form";
+import { InvoicePartyCard } from "@/components/invoice/fields";
+import {
+  calculateTotals,
+  formatInvoiceDate,
+  formatMoney,
+} from "@/components/invoice/model";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoicePreview({
   open,

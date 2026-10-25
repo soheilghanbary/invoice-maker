@@ -3,13 +3,25 @@
 import { faIR } from "@daypicker/persian";
 import { CalendarDays, FileText } from "lucide-react";
 import { useState } from "react";
-import { Controller, type Control, type UseFormRegister } from "react-hook-form";
+import {
+  type Control,
+  Controller,
+  type UseFormRegister,
+} from "react-hook-form";
+import { Field, SelectField } from "@/components/invoice/fields";
+import {
+  formatInvoiceDate,
+  parseInvoiceDate,
+  toInvoiceDateValue,
+} from "@/components/invoice/model";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Field, SelectField } from "@/components/invoice/fields";
-import { formatInvoiceDate, parseInvoiceDate, toInvoiceDateValue } from "@/components/invoice/model";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceDetailsSection({
@@ -30,8 +42,12 @@ export function InvoiceDetailsSection({
           <FileText size={17} />
         </span>
         <div>
-          <h2 className="text-base font-extrabold text-[#0c4a6e]">اطلاعات فاکتور</h2>
-          <p className="mt-1 text-xs text-[#64748b]">نوع، شماره و تاریخ فاکتور را مشخص کنید</p>
+          <h2 className="text-base font-extrabold text-[#0c4a6e]">
+            اطلاعات فاکتور
+          </h2>
+          <p className="mt-1 text-xs text-[#64748b]">
+            نوع، شماره و تاریخ فاکتور را مشخص کنید
+          </p>
         </div>
       </div>
       <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -64,7 +80,10 @@ export function InvoiceDetailsSection({
                       className="w-full justify-between border-input bg-card px-3.5 text-right font-normal text-foreground hover:bg-card"
                     >
                       <span>{formatInvoiceDate(field.value)}</span>
-                      <CalendarDays size={16} className="text-muted-foreground" />
+                      <CalendarDays
+                        size={16}
+                        className="text-muted-foreground"
+                      />
                     </Button>
                   }
                 />

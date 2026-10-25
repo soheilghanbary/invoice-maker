@@ -1,4 +1,4 @@
-import type { InvoiceItem, InvoiceValues } from '@/types/invoice';
+import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
 
 export const defaultValues: InvoiceValues = {
   type: "پیش فاکتور",

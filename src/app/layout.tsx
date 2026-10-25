@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { font } from "@/assets/fonts";
-import { cn } from "@/lib/utils";
 import { EdgeStoreProvider } from "@/lib/edgestore";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "فاکتورساز آنلاین",

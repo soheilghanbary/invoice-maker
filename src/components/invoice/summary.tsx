@@ -1,14 +1,23 @@
 "use client";
 
-import { Check, FileText, ReceiptText } from 'lucide-react';
-import { Controller, useWatch, type Control, type UseFormRegister } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Field } from '@/components/invoice/fields';
-import { calculateTotals, defaultValues, formatMoney } from '@/components/invoice/model';
-import type { InvoiceValues } from '@/types/invoice';
+import { Check, FileText, ReceiptText } from "lucide-react";
+import {
+  type Control,
+  Controller,
+  type UseFormRegister,
+  useWatch,
+} from "react-hook-form";
+import { Field } from "@/components/invoice/fields";
+import {
+  calculateTotals,
+  defaultValues,
+  formatMoney,
+} from "@/components/invoice/model";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceSummary({
   control,

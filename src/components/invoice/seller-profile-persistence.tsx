@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useWatch, type Control, type useForm } from 'react-hook-form';
-import { defaultValues } from '@/components/invoice/model';
-import type { InvoiceValues } from '@/types/invoice';
+import { useEffect, useState } from "react";
+import { type Control, type useForm, useWatch } from "react-hook-form";
+import { defaultValues } from "@/components/invoice/model";
+import type { InvoiceValues } from "@/types/invoice";
 
 export function SellerProfilePersistence({
   control,

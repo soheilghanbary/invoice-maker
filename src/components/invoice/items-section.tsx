@@ -1,14 +1,23 @@
 "use client";
 
-import { Plus, Trash2 } from 'lucide-react';
-import { ReceiptText } from 'lucide-react';
-import { startTransition, useEffect, useState } from 'react';
-import { useFieldArray, useWatch, type Control, type UseFormRegister } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Field } from '@/components/invoice/fields';
-import { calculateTotals, defaultValues, formatMoney, moneyFormat } from '@/components/invoice/model';
-import type { InvoiceItem, InvoiceValues } from '@/types/invoice';
+import { Plus, ReceiptText, Trash2 } from "lucide-react";
+import { startTransition, useEffect, useState } from "react";
+import {
+  type Control,
+  type UseFormRegister,
+  useFieldArray,
+  useWatch,
+} from "react-hook-form";
+import { Field } from "@/components/invoice/fields";
+import {
+  calculateTotals,
+  defaultValues,
+  formatMoney,
+  moneyFormat,
+} from "@/components/invoice/model";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
 
 export function InvoiceItemsSection({
   control,

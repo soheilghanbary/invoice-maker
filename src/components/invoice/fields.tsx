@@ -1,12 +1,22 @@
 "use client";
 
-import { ReceiptText } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { Controller, type Control, type UseFormRegister } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { InvoiceValues } from '@/types/invoice';
+import { ReceiptText } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  type Control,
+  Controller,
+  type UseFormRegister,
+} from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { InvoiceValues } from "@/types/invoice";
 
 export function Field({
   label,

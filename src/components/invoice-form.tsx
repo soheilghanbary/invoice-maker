@@ -1,19 +1,22 @@
 "use client";
 
-import { startTransition, useEffect, useRef, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import { PartyFields } from '@/components/invoice/fields';
-import { InvoiceDetailsSection } from '@/components/invoice/details-section';
-import { InvoiceNotesAndStamp } from '@/components/invoice/notes-and-stamp';
-import { InvoiceItemsSection } from '@/components/invoice/items-section';
-import { InvoicePreview } from '@/components/invoice/preview';
-import { defaultValues } from '@/components/invoice/model';
-import { SellerProfilePersistence } from '@/components/invoice/seller-profile-persistence';
-import { InvoiceSummary } from '@/components/invoice/summary';
-import { InvoicePageIntro, InvoiceTopBar } from '@/components/invoice/page-header';
-import { useEdgeStore } from '@/lib/edgestore';
-import { getInvoice, saveInvoice } from '@/lib/invoice-storage';
-import type { InvoiceValues } from '@/types/invoice';
+import { startTransition, useEffect, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { InvoiceDetailsSection } from "@/components/invoice/details-section";
+import { PartyFields } from "@/components/invoice/fields";
+import { InvoiceItemsSection } from "@/components/invoice/items-section";
+import { defaultValues } from "@/components/invoice/model";
+import { InvoiceNotesAndStamp } from "@/components/invoice/notes-and-stamp";
+import {
+  InvoicePageIntro,
+  InvoiceTopBar,
+} from "@/components/invoice/page-header";
+import { InvoicePreview } from "@/components/invoice/preview";
+import { SellerProfilePersistence } from "@/components/invoice/seller-profile-persistence";
+import { InvoiceSummary } from "@/components/invoice/summary";
+import { useEdgeStore } from "@/lib/edgestore";
+import { getInvoice, saveInvoice } from "@/lib/invoice-storage";
+import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceForm({
   invoiceId,
@@ -118,10 +121,14 @@ export function InvoiceForm({
       setValue("number", saved.number);
       if (pendingStampConfirmation) {
         try {
-          await edgestore.businessImages.confirm({ url: pendingStampConfirmation });
+          await edgestore.businessImages.confirm({
+            url: pendingStampConfirmation,
+          });
           setPendingStampConfirmation("");
         } catch {
-          setSaveError("فاکتور ذخیره شد، اما تأیید تصویر مهر انجام نشد. دوباره ذخیره را بزنید.");
+          setSaveError(
+            "فاکتور ذخیره شد، اما تأیید تصویر مهر انجام نشد. دوباره ذخیره را بزنید.",
+          );
           return;
         }
       }
@@ -145,14 +152,21 @@ export function InvoiceForm({
       <InvoiceTopBar isEditing={Boolean(activeInvoiceId)} />
 
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 sm:px-8 sm:pt-10 sm:pb-28 lg:px-12 lg:pb-10">
-        <InvoicePageIntro isEditing={Boolean(activeInvoiceId)} onPreview={() => setPreviewOpen(true)} />
+        <InvoicePageIntro
+          isEditing={Boolean(activeInvoiceId)}
+          onPreview={() => setPreviewOpen(true)}
+        />
 
         <form
           onSubmit={handleSubmit(persistInvoice)}
           className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_310px]"
         >
           <div className="space-y-5">
-            <InvoiceDetailsSection control={control} register={register} timeZone={timeZone} />
+            <InvoiceDetailsSection
+              control={control}
+              register={register}
+              timeZone={timeZone}
+            />
 
             <PartyFields
               title="اطلاعات فروشنده"
@@ -171,7 +185,9 @@ export function InvoiceForm({
               register={register}
               stampUrl={stampPreview}
               disabled={saving || loadingInvoice}
-              onStampChange={(value) => setValue("stampPreview", value, { shouldDirty: true })}
+              onStampChange={(value) =>
+                setValue("stampPreview", value, { shouldDirty: true })
+              }
               onPendingStampChange={setPendingStampConfirmation}
               onStampUploadingChange={setStampUploading}
             />

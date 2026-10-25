@@ -58,7 +58,9 @@ export function StampUploadField({
       setProgress(100);
     } catch {
       setFileName("");
-      setError("بارگذاری تصویر انجام نشد. اتصال را بررسی کنید و دوباره تلاش کنید.");
+      setError(
+        "بارگذاری تصویر انجام نشد. اتصال را بررسی کنید و دوباره تلاش کنید.",
+      );
     } finally {
       setUploading(false);
       onUploadingChange(false);
@@ -86,7 +88,11 @@ export function StampUploadField({
           <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white ring-1 ring-[#e2edf5]">
             {value ? (
               // biome-ignore lint/performance/noImgElement: EdgeStore URL is a user-uploaded preview
-              <img src={value} alt="پیش‌نمایش مهر یا امضا" className="size-full object-contain p-1" />
+              <img
+                src={value}
+                alt="پیش‌نمایش مهر یا امضا"
+                className="size-full object-contain p-1"
+              />
             ) : (
               <ImagePlus size={22} className="text-[#0284c7]" />
             )}
@@ -147,7 +153,11 @@ export function StampUploadField({
             </div>
           </div>
         )}
-        {error && <p role="alert" className="mt-3 text-xs leading-5 text-red-700">{error}</p>}
+        {error && (
+          <p role="alert" className="mt-3 text-xs leading-5 text-red-700">
+            {error}
+          </p>
+        )}
         {value && !uploading && !error && (
           <p className="mt-3 text-xs font-medium text-emerald-700">
             {fileName

@@ -1,8 +1,8 @@
 "use client";
 
 import type { UseFormRegister } from "react-hook-form";
-import { Textarea } from "@/components/ui/textarea";
 import { StampUploadField } from "@/components/invoice/stamp-upload-field";
+import { Textarea } from "@/components/ui/textarea";
 import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceNotesAndStamp({
