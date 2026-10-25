@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { deleteInvoice, listInvoices } from "@/lib/invoice-storage";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { deleteInvoice, listInvoices } from "@/lib/invoice-storage";
 import type { InvoiceRecord } from "@/types/invoice";
 
 const numberFormat = new Intl.NumberFormat("fa-IR", {
@@ -54,7 +54,9 @@ export function InvoicesList() {
   useEffect(() => {
     listInvoices()
       .then(setRows)
-      .catch(() => setStorageError("بارگذاری فاکتورها در این مرورگر انجام نشد."))
+      .catch(() =>
+        setStorageError("بارگذاری فاکتورها در این مرورگر انجام نشد."),
+      )
       .finally(() => setLoading(false));
   }, []);
   const filteredInvoices = useMemo(() => {
@@ -202,7 +204,10 @@ export function InvoicesList() {
           </div>
 
           {storageError && (
-            <p role="alert" className="mx-5 mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-6">
+            <p
+              role="alert"
+              className="mx-5 mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-6"
+            >
               {storageError}
             </p>
           )}

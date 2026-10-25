@@ -24,7 +24,6 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form";
-import { getInvoice, saveInvoice } from "@/lib/invoice-storage";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -49,6 +48,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { getInvoice, saveInvoice } from "@/lib/invoice-storage";
 import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
 
 const defaultValues: InvoiceValues = {
@@ -844,10 +844,10 @@ function InvoiceSummary({
         {loading
           ? "در حال بارگذاری..."
           : saving
-          ? "در حال ذخیره..."
-          : isEditing
-            ? "ذخیره تغییرات"
-            : "ذخیره فاکتور"}
+            ? "در حال ذخیره..."
+            : isEditing
+              ? "ذخیره تغییرات"
+              : "ذخیره فاکتور"}
       </Button>
       <Button
         type="button"

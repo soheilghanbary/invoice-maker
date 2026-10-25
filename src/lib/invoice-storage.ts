@@ -1,4 +1,8 @@
-import type { InvoiceRecord, InvoiceValues, SavedInvoice } from "@/types/invoice";
+import type {
+  InvoiceRecord,
+  InvoiceValues,
+  SavedInvoice,
+} from "@/types/invoice";
 
 const databaseName = "factorino-invoices";
 const storeName = "invoices";
@@ -32,16 +36,26 @@ function summary(invoice: SavedInvoice): InvoiceRecord {
 
 function calculateTotal(invoice: InvoiceValues) {
   const subtotal = invoice.items.reduce(
-    (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
+    (sum, item) =>
+      sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
     0,
   );
-  const taxable = Math.max(0, subtotal - Math.min(subtotal, Math.max(0, Number(invoice.discount) || 0)));
+  const taxable = Math.max(
+    0,
+    subtotal - Math.min(subtotal, Math.max(0, Number(invoice.discount) || 0)),
+  );
   return taxable + (invoice.taxEnabled ? taxable * 0.1 : 0);
 }
 
-function uniqueNumber(requested: string, all: SavedInvoice[], exceptId?: number) {
+function uniqueNumber(
+  requested: string,
+  all: SavedInvoice[],
+  exceptId?: number,
+) {
   const existingNumbers = new Set(
-    all.filter((invoice) => invoice.id !== exceptId).map((invoice) => invoice.number),
+    all
+      .filter((invoice) => invoice.id !== exceptId)
+      .map((invoice) => invoice.number),
   );
   if (!existingNumbers.has(requested)) return requested;
   const match = requested.match(/^(.*?)([0-9۰-۹٠-٩]+)$/);
@@ -55,7 +69,9 @@ function uniqueNumber(requested: string, all: SavedInvoice[], exceptId?: number)
   let candidate = requested;
   do {
     sequence += 1;
-    candidate = `${match[1]}${String(sequence).padStart(match[2].length, "0").replace(/[0-9]/g, (digit) => digits[Number(digit)])}`;
+    candidate = `${match[1]}${String(sequence)
+      .padStart(match[2].length, "0")
+      .replace(/[0-9]/g, (digit) => digits[Number(digit)])}`;
   } while (existingNumbers.has(candidate));
   return candidate;
 }
@@ -75,12 +91,18 @@ export async function listInvoices(): Promise<InvoiceRecord[]> {
   }
 }
 
-export async function getInvoice(id: number): Promise<SavedInvoice | undefined> {
+export async function getInvoice(
+  id: number,
+): Promise<SavedInvoice | undefined> {
   const database = await openDatabase();
   try {
-    const request = database.transaction(storeName, "readonly").objectStore(storeName).get(id);
+    const request = database
+      .transaction(storeName, "readonly")
+      .objectStore(storeName)
+      .get(id);
     return await new Promise((resolve, reject) => {
-      request.onsuccess = () => resolve(request.result as SavedInvoice | undefined);
+      request.onsuccess = () =>
+        resolve(request.result as SavedInvoice | undefined);
       request.onerror = () => reject(request.error);
     });
   } finally {
@@ -88,16 +110,25 @@ export async function getInvoice(id: number): Promise<SavedInvoice | undefined> 
   }
 }
 
-export async function saveInvoice(values: InvoiceValues, id?: number): Promise<InvoiceRecord> {
+export async function saveInvoice(
+  values: InvoiceValues,
+  id?: number,
+): Promise<InvoiceRecord> {
   if (!values.number.trim() || !values.type.trim() || !values.date.trim()) {
     throw new Error("اطلاعات اصلی فاکتور کامل نیست.");
   }
   if (!values.buyer?.name?.trim()) {
     throw new Error("نام خریدار را وارد کنید.");
   }
-  if (values.items.some((item) =>
-    !Number.isFinite(item.quantity) || !Number.isFinite(item.unitPrice) || item.quantity < 0 || item.unitPrice < 0
-  )) {
+  if (
+    values.items.some(
+      (item) =>
+        !Number.isFinite(item.quantity) ||
+        !Number.isFinite(item.unitPrice) ||
+        item.quantity < 0 ||
+        item.unitPrice < 0,
+    )
+  ) {
     throw new Error("مقادیر اقلام فاکتور معتبر نیست.");
   }
   const database = await openDatabase();
@@ -109,13 +140,20 @@ export async function saveInvoice(values: InvoiceValues, id?: number): Promise<I
       let saved: InvoiceRecord | undefined;
       request.onsuccess = () => {
         const all = request.result as SavedInvoice[];
-        const existing = id === undefined ? undefined : all.find((invoice) => invoice.id === id);
+        const existing =
+          id === undefined
+            ? undefined
+            : all.find((invoice) => invoice.id === id);
         if (id !== undefined && !existing) {
           transaction.abort();
           reject(new Error("فاکتور پیدا نشد."));
           return;
         }
-        const payload: InvoiceValues = { ...values, number: uniqueNumber(values.number, all, id), stampPreview: "" };
+        const payload: InvoiceValues = {
+          ...values,
+          number: uniqueNumber(values.number, all, id),
+          stampPreview: "",
+        };
         const record: SavedInvoice = {
           id: id ?? 0,
           number: payload.number,
@@ -127,21 +165,24 @@ export async function saveInvoice(values: InvoiceValues, id?: number): Promise<I
           createdAt: existing?.createdAt ?? new Date().toISOString(),
           payload,
         };
-        const write = id === undefined
-          ? (() => {
-              const { id: _id, ...newRecord } = record;
-              return store.add(newRecord);
-            })()
-          : store.put(record);
+        const write =
+          id === undefined
+            ? (() => {
+                const { id: _id, ...newRecord } = record;
+                return store.add(newRecord);
+              })()
+            : store.put(record);
         write.onsuccess = () => {
           record.id = Number(write.result);
           saved = summary(record);
         };
       };
       request.onerror = () => reject(request.error);
-      transaction.oncomplete = () => saved ? resolve(saved) : reject(new Error("ذخیره فاکتور انجام نشد."));
+      transaction.oncomplete = () =>
+        saved ? resolve(saved) : reject(new Error("ذخیره فاکتور انجام نشد."));
       transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error ?? new Error("ذخیره فاکتور انجام نشد."));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error("ذخیره فاکتور انجام نشد."));
     });
   } finally {
     database.close();
@@ -156,7 +197,8 @@ export async function deleteInvoice(id: number): Promise<void> {
     await new Promise<void>((resolve, reject) => {
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error ?? new Error("حذف فاکتور انجام نشد."));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error("حذف فاکتور انجام نشد."));
     });
   } finally {
     database.close();
