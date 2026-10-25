@@ -152,7 +152,7 @@ export async function saveInvoice(
         const payload: InvoiceValues = {
           ...values,
           number: uniqueNumber(values.number, all, id),
-          stampPreview: "",
+          stampPreview: values.stampPreview,
         };
         const record: SavedInvoice = {
           id: id ?? 0,
