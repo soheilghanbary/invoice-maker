@@ -15,6 +15,7 @@ export function SellerProfilePersistence({
   enabled?: boolean;
 }) {
   const seller = useWatch({ control, name: "seller" });
+  const stampPreview = useWatch({ control, name: "stampPreview" }) ?? "";
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -24,8 +25,14 @@ export function SellerProfilePersistence({
         "factorino-next-seller-profile",
       );
       if (stored) {
-        const parsed = JSON.parse(stored) as Partial<InvoiceValues["seller"]>;
-        setValue("seller", { ...defaultValues.seller, ...parsed });
+        const parsed = JSON.parse(stored) as Partial<InvoiceValues["seller"]> & {
+          seller?: Partial<InvoiceValues["seller"]>;
+          stampPreview?: string;
+        };
+        const isProfile = "seller" in parsed;
+        const storedSeller = parsed.seller ?? parsed;
+        setValue("seller", { ...defaultValues.seller, ...storedSeller });
+        if (isProfile) setValue("stampPreview", parsed.stampPreview ?? "");
       }
     } catch {
       setValue("seller", defaultValues.seller);
@@ -37,10 +44,10 @@ export function SellerProfilePersistence({
     if (enabled && ready && seller) {
       window.localStorage.setItem(
         "factorino-next-seller-profile",
-        JSON.stringify(seller),
+        JSON.stringify({ seller, stampPreview }),
       );
     }
-  }, [enabled, ready, seller]);
+  }, [enabled, ready, seller, stampPreview]);
 
   return null;
 }

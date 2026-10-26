@@ -230,6 +230,7 @@ function InvoiceFormContent({
                   register={register}
                   stampUrl={stampPreview}
                   disabled={saving || loadingInvoice}
+                  reusable={!activeInvoiceId}
                   onStampChange={(value) =>
                     setValue("stampPreview", value, { shouldDirty: true })
                   }

@@ -9,6 +9,7 @@ export function InvoiceNotesAndStamp({
   register,
   stampUrl,
   disabled,
+  reusable,
   onStampChange,
   onPendingStampChange,
   onStampUploadingChange,
@@ -16,6 +17,7 @@ export function InvoiceNotesAndStamp({
   register: UseFormRegister<InvoiceValues>;
   stampUrl: string;
   disabled: boolean;
+  reusable?: boolean;
   onStampChange: (url: string) => void;
   onPendingStampChange: (url: string) => void;
   onStampUploadingChange: (uploading: boolean) => void;
@@ -36,6 +38,7 @@ export function InvoiceNotesAndStamp({
       <StampUploadField
         value={stampUrl}
         disabled={disabled}
+        reusable={reusable}
         onChange={onStampChange}
         onPendingConfirmationChange={onPendingStampChange}
         onUploadingChange={onStampUploadingChange}
