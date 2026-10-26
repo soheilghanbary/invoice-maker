@@ -131,7 +131,7 @@ function InvoiceFormContent({
     if (!sheet) return;
 
     const availableHeight = ((297 - 14) * 96) / 25.4;
-    const scale = Math.min(1, availableHeight / sheet.scrollHeight);
+    const scale = Math.min(1.015, availableHeight / sheet.scrollHeight);
     sheet.style.setProperty("--invoice-print-scale", String(scale));
     sheet.style.setProperty("--invoice-print-width", `${100 / scale}%`);
 
