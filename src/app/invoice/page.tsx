@@ -27,6 +27,7 @@ async function InvoiceData({
   const invoiceId = Number.isSafeInteger(id) && id > 0 ? id : undefined;
   return (
     <InvoiceForm
+      key={invoiceId ?? "new"}
       invoiceId={invoiceId}
       showPreview={params.preview === "1" && !!invoiceId}
     />

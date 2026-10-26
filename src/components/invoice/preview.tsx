@@ -1,6 +1,8 @@
 "use client";
 
+import { cn } from "cn";
 import { Printer, X } from "lucide-react";
+import Image from "next/image";
 import { type Control, useWatch } from "react-hook-form";
 import { InvoicePartyCard } from "@/components/invoice/fields";
 import {
@@ -213,13 +215,20 @@ export function InvoicePreview({
                         </p>
                       </section>
                     )}
-                    <div className="mt-5 flex min-h-20 items-center flex-col justify-between border-t border-dashed border-[#cbd5e1] text-[10px] text-[#64748b]">
+                    <div
+                      className={cn(
+                        "mt-5 flex min-h-20 items-center border-dashed flex-col justify-between border-t-0 border-[#cbd5e1] text-[10px] text-[#64748b]",
+                        values.notes && "border-t",
+                      )}
+                    >
                       {stampPreview && (
-                        // biome-ignore lint/performance/noImgElement: it is a preview
-                        <img
+                        <Image
                           src={stampPreview}
                           alt="مهر یا امضای فروشنده"
-                          className="max-h-[36mm] max-w-[40mm] size-36 object-contain mr-auto pl-4"
+                          className="max-h-[40mm] max-w-[40mm] size-40 object-contain mr-auto pl-4"
+                          width={40}
+                          height={40}
+                          unoptimized
                         />
                       )}
                       <span className="text-left mr-auto pl-4">
