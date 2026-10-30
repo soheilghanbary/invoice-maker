@@ -25,7 +25,9 @@ export function SellerProfilePersistence({
         "factorino-next-seller-profile",
       );
       if (stored) {
-        const parsed = JSON.parse(stored) as Partial<InvoiceValues["seller"]> & {
+        const parsed = JSON.parse(stored) as Partial<
+          InvoiceValues["seller"]
+        > & {
           seller?: Partial<InvoiceValues["seller"]>;
           stampPreview?: string;
         };
