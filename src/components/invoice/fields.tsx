@@ -131,7 +131,7 @@ export function PartyFields({
   const additionalFields = fields.slice(2);
 
   const renderFields = (items: (typeof fields)[number][]) => (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-2">
+    <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
       {items.map((field) => (
         <div
           key={field.key}
@@ -148,7 +148,6 @@ export function PartyFields({
             <Input
               {...register(`${name}.${field.key}` as const)}
               type={"type" in field ? field.type : "text"}
-              placeholder={field.placeholder}
               dir={
                 field.key === "address" || field.key === "name" ? "rtl" : "auto"
               }

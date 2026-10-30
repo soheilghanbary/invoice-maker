@@ -108,6 +108,7 @@ export function StampUploadField({
                 src={value}
                 alt="پیش‌نمایش مهر یا امضا"
                 className="size-full object-contain"
+                draggable={false}
               />
             </div>
             <div className="min-w-0 flex-1">

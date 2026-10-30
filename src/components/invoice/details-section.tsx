@@ -50,7 +50,7 @@ export function InvoiceDetailsSection({
           </p>
         </div>
       </div>
-      <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-x-4 gap-y-5 grid-cols-2 lg:grid-cols-4">
         <SelectField
           label="نوع فاکتور"
           name="type"
