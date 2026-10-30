@@ -31,7 +31,7 @@ function validStampUrl(value: string) {
 }
 
 function pdfBaseUrl(request: Request) {
-  const configured = process.env.INVOICE_PDF_BASE_URL;
+  const configured = process.env.NEXT_PUBLIC_URL;
   if (configured) return new URL(configured).origin;
   const requestUrl = new URL(request.url);
   if (
@@ -40,7 +40,7 @@ function pdfBaseUrl(request: Request) {
   ) {
     return requestUrl.origin;
   }
-  throw new Error("INVOICE_PDF_BASE_URL must be configured for PDF rendering.");
+  throw new Error("NEXT_PUBLIC_URL must be configured for PDF rendering.");
 }
 
 async function launchBrowser(): Promise<Browser> {
