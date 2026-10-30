@@ -12,6 +12,7 @@ export type InvoiceFormState = {
   saveError: string;
   previewOpen: boolean;
   stampUploading: boolean;
+  downloadingPdf: boolean;
   pendingStampConfirmation: string;
   timeZone?: string;
   set: (state: Partial<InvoiceFormState>) => void;
@@ -26,6 +27,7 @@ export function createInvoiceFormStore(invoiceId?: number) {
     saveError: "",
     previewOpen: false,
     stampUploading: false,
+    downloadingPdf: false,
     pendingStampConfirmation: "",
     timeZone: undefined,
     set: (state) => set(state),

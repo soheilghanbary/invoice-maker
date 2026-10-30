@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight, Download, FileText, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function InvoiceTopBar({ isEditing }: { isEditing: boolean }) {
+export function InvoiceTopBar() {
   return (
     <header className="sticky top-0 z-20 border-b border-[#dbeafe] bg-[#f8fbfd]/95 backdrop-blur print:hidden">
       <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-4 sm:px-8 lg:px-12">
@@ -24,12 +24,6 @@ export function InvoiceTopBar({ isEditing }: { isEditing: boolean }) {
           >
             فاکتورهای من
           </Link>
-          <span className="hidden text-sm text-[#64748b] sm:inline">
-            {isEditing ? "ویرایش فاکتور" : "پیش‌نویس فاکتور"}
-          </span>
-          <span className="rounded-lg bg-[#e0f2fe] px-3 py-1.5 text-xs font-bold text-[#0369a1]">
-            {isEditing ? "در حال ویرایش" : "پیش‌نویس"}
-          </span>
         </div>
       </div>
     </header>
@@ -39,9 +33,15 @@ export function InvoiceTopBar({ isEditing }: { isEditing: boolean }) {
 export function InvoicePageIntro({
   isEditing,
   onPreview,
+  onDownloadPdf,
+  downloadingPdf,
+  downloadDisabled,
 }: {
   isEditing: boolean;
   onPreview: () => void;
+  onDownloadPdf: () => void;
+  downloadingPdf: boolean;
+  downloadDisabled: boolean;
 }) {
   return (
     <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -59,14 +59,26 @@ export function InvoicePageIntro({
           اطلاعات فاکتور را وارد کنید؛ پیش‌نمایش همیشه به‌روز است.
         </p>
       </div>
-      <Button
-        type="button"
-        size="lg"
-        onClick={onPreview}
-        className="hidden gap-2.5 lg:inline-flex"
-      >
-        <FileText size={17} /> پیش‌نمایش و چاپ PDF
-      </Button>
+      <div className="flex flex-wrap gap-2.5">
+        <Button type="button" size="lg" onClick={onPreview} className="gap-2.5">
+          <FileText size={17} /> پیش‌نمایش و چاپ PDF
+        </Button>
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          onClick={onDownloadPdf}
+          disabled={downloadDisabled}
+          className="gap-2.5"
+        >
+          {downloadingPdf ? (
+            <LoaderCircle size={17} className="animate-spin" />
+          ) : (
+            <Download size={17} />
+          )}
+          {downloadingPdf ? "در حال ساخت PDF…" : "دانلود PDF"}
+        </Button>
+      </div>
     </div>
   );
 }

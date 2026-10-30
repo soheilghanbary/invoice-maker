@@ -3,7 +3,7 @@ import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
 export const defaultValues: InvoiceValues = {
   type: "پیش فاکتور",
   number: "۱۴۰۵-۱۰۰۱",
-  date: "2026-10-24",
+  date: getTodayDateValue(),
   currency: "ریال",
   seller: {
     name: "",
@@ -27,6 +27,19 @@ export const defaultValues: InvoiceValues = {
   discount: 0,
   taxEnabled: false,
 };
+
+export function getTodayDateValue() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    calendar: "gregory",
+    timeZone: "Asia/Tehran",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const part = (type: "year" | "month" | "day") =>
+    parts.find((value) => value.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
 
 export const moneyFormat = new Intl.NumberFormat("fa-IR", {
   maximumFractionDigits: 0,

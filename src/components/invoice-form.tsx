@@ -56,6 +56,7 @@ function InvoiceFormContent({
   const saveError = useInvoiceFormStore((state) => state.saveError);
   const previewOpen = useInvoiceFormStore((state) => state.previewOpen);
   const stampUploading = useInvoiceFormStore((state) => state.stampUploading);
+  const downloadingPdf = useInvoiceFormStore((state) => state.downloadingPdf);
   const pendingStampConfirmation = useInvoiceFormStore(
     (state) => state.pendingStampConfirmation,
   );
@@ -149,6 +150,43 @@ function InvoiceFormContent({
     window.print();
   };
 
+  const downloadPdf = async () => {
+    setFormState({ downloadingPdf: true, saveError: "" });
+    try {
+      const response = await fetch("/api/invoice-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(getValues()),
+      });
+      if (!response.ok) {
+        const result = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(result?.error || "ساخت فایل PDF انجام نشد.");
+      }
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      const disposition = response.headers.get("Content-Disposition") ?? "";
+      const utf8Filename = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+      anchor.download = utf8Filename
+        ? decodeURIComponent(utf8Filename)
+        : "invoice.pdf";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch (error) {
+      setFormState({
+        saveError:
+          error instanceof Error ? error.message : "ساخت فایل PDF انجام نشد.",
+      });
+    } finally {
+      setFormState({ downloadingPdf: false });
+    }
+  };
+
   const persistInvoice = async () => {
     setFormState({ saving: true, saveError: "" });
     try {
@@ -187,12 +225,16 @@ function InvoiceFormContent({
         setValue={setValue}
         enabled={!activeInvoiceId}
       />
-      <InvoiceTopBar isEditing={Boolean(activeInvoiceId)} />
-
+      <InvoiceTopBar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 sm:px-8 sm:pt-10 sm:pb-28 lg:px-12 lg:pb-10">
         <InvoicePageIntro
           isEditing={Boolean(activeInvoiceId)}
           onPreview={() => setFormState({ previewOpen: true })}
+          onDownloadPdf={downloadPdf}
+          downloadingPdf={downloadingPdf}
+          downloadDisabled={
+            downloadingPdf || loadingInvoice || saving || stampUploading
+          }
         />
 
         <form
@@ -226,9 +268,7 @@ function InvoiceFormContent({
                   name="buyer"
                   register={register}
                 />
-
                 <InvoiceItemsSection control={control} register={register} />
-
                 <InvoiceNotesAndStamp
                   register={register}
                   stampUrl={stampPreview}
@@ -247,7 +287,6 @@ function InvoiceFormContent({
               </>
             )}
           </div>
-
           <InvoiceSummary
             control={control}
             onPreview={() => setFormState({ previewOpen: true })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReceiptText } from "lucide-react";
+import { ChevronDown, ReceiptText } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   type Control,
@@ -127,6 +127,37 @@ export function PartyFields({
       placeholder: "شماره اقتصادی",
     },
   ] as const;
+  const primaryFields = fields.slice(0, 2);
+  const additionalFields = fields.slice(2);
+
+  const renderFields = (items: (typeof fields)[number][]) => (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-2">
+      {items.map((field) => (
+        <div
+          key={field.key}
+          className={
+            field.key === "nationalId" || field.key === "economicCode"
+              ? "col-span-1"
+              : "col-span-2 sm:col-span-1"
+          }
+        >
+          <Field
+            label={field.label}
+            required={"required" in field && field.required}
+          >
+            <Input
+              {...register(`${name}.${field.key}` as const)}
+              type={"type" in field ? field.type : "text"}
+              placeholder={field.placeholder}
+              dir={
+                field.key === "address" || field.key === "name" ? "rtl" : "auto"
+              }
+            />
+          </Field>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7">
@@ -143,34 +174,18 @@ export function PartyFields({
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-2">
-        {fields.map((field) => (
-          <div
-            key={field.key}
-            className={
-              field.key === "nationalId" || field.key === "economicCode"
-                ? "col-span-1"
-                : "col-span-2 sm:col-span-1"
-            }
-          >
-            <Field
-              label={field.label}
-              required={"required" in field && field.required}
-            >
-              <Input
-                {...register(`${name}.${field.key}` as const)}
-                type={"type" in field ? field.type : "text"}
-                placeholder={field.placeholder}
-                dir={
-                  field.key === "address" || field.key === "name"
-                    ? "rtl"
-                    : "auto"
-                }
-              />
-            </Field>
-          </div>
-        ))}
-      </div>
+      {renderFields(primaryFields)}
+      <details className="group mt-5">
+        <summary className="flex cursor-pointer list-none items-center gap-4 rounded-lg py-1 text-sm font-bold text-[#0369a1] outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] [&::-webkit-details-marker]:hidden">
+          <span>مشخصات بیشتر</span>
+          <ChevronDown
+            size={17}
+            aria-hidden="true"
+            className="text-[#64748b] transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <div className="pt-4">{renderFields(additionalFields)}</div>
+      </details>
     </section>
   );
 }

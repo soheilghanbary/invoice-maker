@@ -1,6 +1,5 @@
 "use client";
-
-import { Check, FileText, ReceiptText } from "lucide-react";
+import { Check, ReceiptText } from "lucide-react";
 import { type Control, Controller, useWatch } from "react-hook-form";
 import { Field } from "@/components/invoice/fields";
 import {
@@ -16,7 +15,6 @@ import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceSummary({
   control,
-  onPreview,
   saving,
   loading,
   uploading,
@@ -142,19 +140,6 @@ export function InvoiceSummary({
                 ? "ذخیره تغییرات"
                 : "ذخیره فاکتور"}
       </Button>
-      <Button
-        type="button"
-        size="lg"
-        onClick={onPreview}
-        className="w-full gap-2"
-        variant={"secondary"}
-      >
-        <FileText size={16} /> پیش‌نمایش فاکتور
-      </Button>
-      <p className="mt-3 text-center text-[11px] leading-5 text-[#64748b]">
-        <Check size={12} className="mr-1 inline text-[#0284c7]" /> چاپ یا ذخیره
-        مستقیم به صورت PDF
-      </p>
     </aside>
   );
 }
