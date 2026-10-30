@@ -176,12 +176,12 @@ export function PartyFields({
       </div>
       {renderFields(primaryFields)}
       <details className="group mt-5">
-        <summary className="flex cursor-pointer list-none items-center gap-4 rounded-lg py-1 text-sm font-bold text-[#0369a1] outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] [&::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer select-none list-none items-center gap-2 rounded-lg py-1 text-sm font-bold text-[#0369a1] outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] [&::-webkit-details-marker]:hidden">
           <span>مشخصات بیشتر</span>
           <ChevronDown
             size={17}
             aria-hidden="true"
-            className="text-[#64748b] transition-transform group-open:rotate-180"
+            className="transition-transform group-open:rotate-180 text-[#0369a1]"
           />
         </summary>
         <div className="pt-4">{renderFields(additionalFields)}</div>

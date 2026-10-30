@@ -77,7 +77,7 @@ export function InvoiceDetailsSection({
                       type="button"
                       variant="outline"
                       onBlur={field.onBlur}
-                      className="w-full justify-between border-input bg-card px-3.5 text-right font-normal text-foreground hover:bg-card"
+                      className="w-full justify-between border-input bg-card px-3.5 text-right font-normal text-foreground"
                     >
                       <span>{formatInvoiceDate(field.value)}</span>
                       <CalendarDays
@@ -87,18 +87,18 @@ export function InvoiceDetailsSection({
                     </Button>
                   }
                 />
-                <PopoverContent align="end" className="w-auto p-1">
+                <PopoverContent className="w-auto p-1">
                   <Calendar
                     mode="single"
                     selected={parseInvoiceDate(field.value)}
                     onSelect={(date) => {
-                      if (date) field.onChange(toInvoiceDateValue(date));
+                      if (!date) return;
+                      field.onChange(toInvoiceDateValue(date));
                       setCalendarOpen(false);
                     }}
                     locale={faIR}
                     dir="rtl"
                     timeZone={timeZone}
-                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
