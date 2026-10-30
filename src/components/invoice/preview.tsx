@@ -47,9 +47,9 @@ export function InvoicePreview({
       <DialogContent
         id="invoice-preview-overlay"
         showCloseButton={false}
-        className="fixed! inset-0! left-0! top-0! z-50! flex! w-full! max-w-none! translate-x-0! translate-y-0! flex-col! items-center! justify-center! gap-0! rounded-none! bg-transparent! p-3! ring-0! sm:p-6! sm:max-w-none!"
+        className="fixed! inset-0! left-0! top-0! z-50! flex! w-full! max-w-none! translate-x-0! translate-y-0! flex-col! items-center! justify-center! gap-0! rounded-none! bg-transparent! p-3! ring-0! sm:p-6! sm:max-w-none! print:static! print:!block! print:!h-auto! print:!min-h-0! print:!overflow-visible! print:!p-0!"
       >
-        <section className="my-auto flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <section className="my-auto flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl print:my-0! print:block! print:h-auto! print:max-h-none! print:max-w-none! print:overflow-visible! print:rounded-none! print:shadow-none!">
           <div className="flex shrink-0 items-center justify-between border-b border-[#e0f2fe] px-5 py-4 print:hidden">
             <div>
               <DialogTitle
