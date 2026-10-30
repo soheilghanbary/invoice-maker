@@ -89,6 +89,9 @@ function InvoiceFormContent({
         reset({
           ...defaultValues,
           ...invoice.payload,
+          discount: Number.isFinite(Number(invoice.payload.discount))
+            ? Math.max(0, Number(invoice.payload.discount))
+            : 0,
           seller: { ...defaultValues.seller, ...invoice.payload.seller },
           buyer: { ...defaultValues.buyer, ...invoice.payload.buyer },
         });
@@ -247,7 +250,6 @@ function InvoiceFormContent({
 
           <InvoiceSummary
             control={control}
-            register={register}
             onPreview={() => setFormState({ previewOpen: true })}
             saving={saving}
             loading={loadingInvoice || invoiceLoadFailed}

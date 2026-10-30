@@ -18,4 +18,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withRedact(nextConfig);
+export default nextConfig;

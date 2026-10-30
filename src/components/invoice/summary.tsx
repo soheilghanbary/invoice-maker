@@ -1,12 +1,7 @@
 "use client";
 
 import { Check, FileText, ReceiptText } from "lucide-react";
-import {
-  type Control,
-  Controller,
-  type UseFormRegister,
-  useWatch,
-} from "react-hook-form";
+import { type Control, Controller, useWatch } from "react-hook-form";
 import { Field } from "@/components/invoice/fields";
 import {
   calculateTotals,
@@ -21,7 +16,6 @@ import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceSummary({
   control,
-  register,
   onPreview,
   saving,
   loading,
@@ -29,7 +23,6 @@ export function InvoiceSummary({
   isEditing,
 }: {
   control: Control<InvoiceValues>;
-  register: UseFormRegister<InvoiceValues>;
   onPreview: () => void;
   saving: boolean;
   loading: boolean;
@@ -60,14 +53,33 @@ export function InvoiceSummary({
         </div>
         <Field label="تخفیف">
           <div className="relative">
-            <Input
-              {...register("discount", { valueAsNumber: true })}
-              type="number"
-              min="0"
-              step="1"
-              placeholder="۰"
-              className="pl-14 text-left tabular-nums"
-              dir="ltr"
+            <Controller
+              control={control}
+              name="discount"
+              render={({ field }) => (
+                <Input
+                  ref={field.ref}
+                  name={field.name}
+                  value={field.value ?? 0}
+                  onBlur={(event) => {
+                    field.onBlur();
+                    const value = Number(event.currentTarget.value);
+                    field.onChange(
+                      Number.isFinite(value) ? Math.max(0, value) : 0,
+                    );
+                  }}
+                  onChange={(event) => {
+                    const value = event.currentTarget.value;
+                    field.onChange(value === "" ? "" : Number(value));
+                  }}
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="۰"
+                  className="pl-14 text-left tabular-nums"
+                  dir="ltr"
+                />
+              )}
             />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#64748b]">
               {currency}

@@ -153,6 +153,9 @@ export async function saveInvoice(
           ...values,
           number: uniqueNumber(values.number, all, id),
           stampPreview: values.stampPreview,
+          discount: Number.isFinite(Number(values.discount))
+            ? Math.max(0, Number(values.discount))
+            : 0,
         };
         const record: SavedInvoice = {
           id: id ?? 0,
