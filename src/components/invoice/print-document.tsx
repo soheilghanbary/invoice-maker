@@ -251,8 +251,8 @@ export const INVOICE_PRINT_CSS = `
 }
 .inv-stamp {
   margin-bottom: 8px;
-  max-height: 22mm;
-  max-width: 22mm;
+  width: 10rem;
+  height: 10rem;
   object-fit: contain;
 }
 .inv-footer {
@@ -425,12 +425,12 @@ export function renderInvoicePrintHtml(values: InvoiceValues): string {
     : "";
 
   return `<header class="inv-header">
+  <h1 class="inv-title">${escapeHtml(values.type || "فاکتور فروش")}</h1>
   <div class="inv-meta">
     <p class="inv-meta-label">شماره فاکتور</p>
     <p class="inv-number">${escapeHtml(values.number || "—")}</p>
     <p class="inv-date">تاریخ صدور: <span class="inv-date-value">${escapeHtml(formatInvoiceDate(values.date))}</span></p>
   </div>
-  <h1 class="inv-title">${escapeHtml(values.type || "فاکتور فروش")}</h1>
 </header>
 
 <div class="inv-parties">
