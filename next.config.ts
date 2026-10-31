@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  outputFileTracingIncludes: {
+    "/api/invoice-pdf": ["./node_modules/playwright-core/**"],
+  },
 };
 
 export default withRedact(nextConfig);
