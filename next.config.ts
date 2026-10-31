@@ -2,8 +2,8 @@ import { withRedact } from "@tanstack/redact/next";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: false,
-  partialPrefetching: false,
+  cacheComponents: true,
+  partialPrefetching: true,
   reactCompiler: true,
   experimental: {
     turbopackRustReactCompiler: true,
@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     "/api/invoice/pdf": [
       "./node_modules/playwright-core/**",
       "./node_modules/@sparticuz/chromium/bin/**",
+      "./src/assets/fonts/IRANSansXVF.woff2",
     ],
   },
 };

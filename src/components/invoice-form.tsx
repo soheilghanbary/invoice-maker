@@ -134,7 +134,7 @@ function InvoiceFormContent({
     setDownloadingPdf(true);
     setActionState((state) => ({ ...state, error: "" }));
     try {
-      const response = await fetch("/api/invoice-pdf", {
+      const response = await fetch("/api/invoice/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(getValues()),
