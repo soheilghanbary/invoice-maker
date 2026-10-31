@@ -141,7 +141,7 @@ export function InvoiceSummary({
             </LedgerRow>
           )}
         </div>
-        <div className="flex items-end justify-between border-t-2 border-primary/25 px-5 pb-4 pt-3">
+        <div className="flex items-end justify-between border-t border-primary/25 px-5 pb-4 pt-3">
           <span className="text-sm font-bold text-foreground">قابل پرداخت</span>
           <span className="text-left">
             <strong className="block text-2xl font-bold leading-7 tabular-nums text-primary">

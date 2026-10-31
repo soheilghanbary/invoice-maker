@@ -68,7 +68,7 @@ export function InvoicePageIntro({
         </Button>
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           onClick={onDownloadPdf}
           disabled={downloadDisabled}
           className="gap-2"
@@ -78,7 +78,7 @@ export function InvoicePageIntro({
           ) : (
             <Download size={16} />
           )}
-          {downloadingPdf ? "در حال ساخت PDF…" : "دانلود PDF"}
+          دانلود PDF
         </Button>
       </div>
     </div>

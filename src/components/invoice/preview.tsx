@@ -238,7 +238,7 @@ export function InvoicePreview({
                         <Image
                           src={stampPreview}
                           alt="مهر یا امضای فروشنده"
-                          className="mb-2 max-h-[22mm] max-w-[22mm] object-contain"
+                          className="mb-2 size-32 object-contain"
                           width={40}
                           height={40}
                           unoptimized
