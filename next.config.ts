@@ -2,8 +2,8 @@ import { withRedact } from "@tanstack/redact/next";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  cacheComponents: false,
+  partialPrefetching: false,
   reactCompiler: true,
   experimental: {
     turbopackRustReactCompiler: true,
@@ -16,8 +16,12 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  serverExternalPackages: ["playwright-core", "@sparticuz/chromium"],
   outputFileTracingIncludes: {
-    "/api/invoice-pdf": ["./node_modules/playwright-core/**"],
+    "/api/invoice/pdf": [
+      "./node_modules/playwright-core/**",
+      "./node_modules/@sparticuz/chromium/bin/**",
+    ],
   },
 };
 
