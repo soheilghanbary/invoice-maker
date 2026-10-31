@@ -23,8 +23,6 @@ export const INVOICE_PRINT_CSS = `
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  border-bottom: 2px solid rgba(12, 74, 110, 0.1);
-  padding-bottom: 20px;
 }
 .inv-meta {
   flex-shrink: 0;
@@ -266,7 +264,6 @@ export const INVOICE_PRINT_CSS = `
 @media (max-width: 640px) {
   .inv-header {
     gap: 12px;
-    padding-bottom: 16px;
   }
   .inv-number {
     font-size: 14px;
