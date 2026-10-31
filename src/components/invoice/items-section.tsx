@@ -1,226 +1,194 @@
 "use client";
 
-import { Plus, ReceiptText, Trash2 } from "lucide-react";
-import { startTransition, useEffect, useState } from "react";
-import {
-  type Control,
-  type UseFormRegister,
-  useFieldArray,
-  useWatch,
-} from "react-hook-form";
+import { Plus, Trash2 } from "lucide-react";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { Field } from "@/components/invoice/fields";
 import {
   calculateTotals,
   defaultValues,
+  formatCount,
   formatMoney,
-  moneyFormat,
 } from "@/components/invoice/model";
+import {
+  LedgerRow,
+  SectionBody,
+  SectionCard,
+  SectionHeader,
+} from "@/components/invoice/section-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { InvoiceItem, InvoiceValues } from "@/types/invoice";
+import type { InvoiceValues } from "@/types/invoice";
 
-export function InvoiceItemsSection({
-  control,
-  register,
-}: {
-  control: Control<InvoiceValues>;
-  register: UseFormRegister<InvoiceValues>;
-}) {
+const ITEM_COLUMNS =
+  "md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)_76px_minmax(0,1fr)_minmax(0,1fr)_36px]";
+
+export function InvoiceItemsSection() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<InvoiceValues>();
   const items = useWatch({ control, name: "items" }) ?? defaultValues.items;
   const currency =
     useWatch({ control, name: "currency" }) ?? defaultValues.currency;
   const subtotal = calculateTotals(items, 0, false).subtotal;
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    startTransition(() => setMounted(true));
-  }, []);
-
-  if (mounted) {
-    return (
-      <MountedInvoiceItems
-        control={control}
-        register={register}
-        items={items}
-        subtotal={subtotal}
-        currency={currency}
-      />
-    );
-  }
-
-  return (
-    <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7">
-      <div className="mb-6 flex items-center gap-3">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-[#f0f9ff] text-[#0284c7]">
-          <ReceiptText size={17} />
-        </span>
-        <div>
-          <h2 className="text-base font-extrabold text-[#0c4a6e]">
-            اقلام فاکتور
-          </h2>
-          <p className="mt-1 text-xs text-[#64748b]">
-            محصول یا خدمات را به فاکتور اضافه کنید
-          </p>
-        </div>
-      </div>
-      <div
-        className="h-24 rounded-xl border border-dashed border-[#e0f2fe] bg-[#f8fbfd]"
-        aria-hidden="true"
-      />
-      <div className="mt-5 flex items-center justify-between border-t border-[#e0f2fe] pt-4 text-sm">
-        <span className="text-[#64748b]">جمع اقلام</span>
-        <strong className="tabular-nums text-[#334155]">
-          {formatMoney(subtotal)} {currency}
-        </strong>
-      </div>
-    </section>
-  );
-}
-
-function MountedInvoiceItems({
-  control,
-  register,
-  items,
-  subtotal,
-  currency,
-}: {
-  control: Control<InvoiceValues>;
-  register: UseFormRegister<InvoiceValues>;
-  items: InvoiceItem[];
-  subtotal: number;
-  currency: InvoiceValues["currency"];
-}) {
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   return (
-    <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-[#f0f9ff] text-[#0284c7]">
-            <ReceiptText size={17} />
+    <SectionCard>
+      <SectionHeader
+        title="اقلام فاکتور"
+        description="محصول یا خدمات را به فاکتور اضافه کنید"
+        action={
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">
+            {formatCount(fields.length)} ردیف
           </span>
-          <div>
-            <h2 className="text-base font-extrabold text-[#0c4a6e]">
-              اقلام فاکتور
-            </h2>
-            <p className="mt-1 text-xs text-[#64748b]">
-              محصول یا خدمات را به فاکتور اضافه کنید
-            </p>
-          </div>
+        }
+      />
+      <SectionBody>
+        <div
+          className={`hidden gap-x-3 border-b border-border pb-2 text-xs font-medium text-muted-foreground md:grid ${ITEM_COLUMNS}`}
+          aria-hidden="true"
+        >
+          <span>نام آیتم</span>
+          <span>توضیحات</span>
+          <span className="text-center">تعداد</span>
+          <span>قیمت واحد</span>
+          <span>جمع</span>
+          <span />
         </div>
-        <span className="rounded-lg bg-[#f0f9ff] px-2.5 py-1 text-xs font-bold text-[#64748b]">
-          {moneyFormat.format(fields.length)} ردیف
-        </span>
-      </div>
-      <div className="space-y-3">
-        {fields.map((item, index) => {
-          const quantity = Number(items[index]?.quantity) || 0;
-          const unitPrice = Number(items[index]?.unitPrice) || 0;
-          return (
-            <div
-              key={item.id}
-              className="grid grid-cols-2 gap-3 rounded-2xl border border-[#dbeafe] bg-white p-4 shadow-[0_2px_10px_rgba(12,74,110,0.04)] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,.55fr)_minmax(0,1fr)_minmax(0,1fr)_36px] md:items-center md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none"
-            >
-              <div className="col-span-full flex min-w-0 items-center justify-between gap-3 md:hidden">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold text-[#64748b]">
-                    ردیف {moneyFormat.format(index + 1)}
+        <div className="divide-y divide-border/60">
+          {fields.map((item, index) => {
+            const quantity = Number(items[index]?.quantity) || 0;
+            const unitPrice = Number(items[index]?.unitPrice) || 0;
+            const nameError = errors.items?.[index]?.name?.message;
+            const quantityError = errors.items?.[index]?.quantity?.message;
+            const unitPriceError = errors.items?.[index]?.unitPrice?.message;
+            return (
+              <div
+                key={item.id}
+                className={`grid grid-cols-2 gap-x-3 gap-y-3 py-3 md:items-center md:gap-y-0 ${ITEM_COLUMNS}`}
+              >
+                <div className="col-span-full flex min-w-0 items-center justify-between gap-3 md:hidden">
+                  <p className="text-xs font-medium tabular-nums text-muted-foreground">
+                    ردیف {formatCount(index + 1)}
                   </p>
-                  <p className="mt-0.5 truncate text-sm font-bold text-[#0c4a6e]">
-                    {items[index]?.name || "آیتم جدید"}
-                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    aria-label={`حذف ردیف ${index + 1}`}
+                    disabled={fields.length === 1}
+                    onClick={() => remove(index)}
+                    className="shrink-0 gap-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 size={13} /> حذف
+                  </Button>
+                </div>
+                <div className="col-span-full min-w-0 md:col-span-1">
+                  <Field
+                    label="نام آیتم"
+                    labelClassName="md:hidden"
+                    error={nameError}
+                  >
+                    <Input
+                      {...register(`items.${index}.name`)}
+                      aria-invalid={Boolean(nameError)}
+                      placeholder="نام محصول / خدمات"
+                    />
+                  </Field>
+                </div>
+                <div className="col-span-full min-w-0 md:col-span-1">
+                  <Field label="توضیحات" labelClassName="md:hidden">
+                    <Input {...register(`items.${index}.description`)} />
+                  </Field>
+                </div>
+                <Field
+                  label="تعداد"
+                  labelClassName="md:hidden"
+                  error={quantityError}
+                >
+                  <Input
+                    {...register(`items.${index}.quantity`, {
+                      valueAsNumber: true,
+                      required: "تعداد را وارد کنید.",
+                      min: { value: 0, message: "تعداد نمی‌تواند منفی باشد." },
+                    })}
+                    type="number"
+                    min="0"
+                    step="any"
+                    aria-invalid={Boolean(quantityError)}
+                    className="text-center tabular-nums"
+                    dir="ltr"
+                  />
+                </Field>
+                <Field
+                  label="قیمت واحد"
+                  labelClassName="md:hidden"
+                  error={unitPriceError}
+                >
+                  <Input
+                    {...register(`items.${index}.unitPrice`, {
+                      valueAsNumber: true,
+                      required: "قیمت واحد را وارد کنید.",
+                      min: {
+                        value: 0,
+                        message: "قیمت نمی‌تواند منفی باشد.",
+                      },
+                    })}
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="۰"
+                    aria-invalid={Boolean(unitPriceError)}
+                    className="text-right tabular-nums"
+                    dir="ltr"
+                  />
+                </Field>
+                <div className="col-span-full min-w-0 md:col-span-1">
+                  <Field label="قیمت کل" labelClassName="md:hidden">
+                    <output className="flex h-9 w-full items-center justify-between gap-2 rounded-md bg-muted px-3 text-sm font-semibold tabular-nums text-foreground md:justify-start md:bg-transparent md:px-0">
+                      <span>{formatMoney(quantity * unitPrice)}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground md:hidden">
+                        {currency}
+                      </span>
+                    </output>
+                  </Field>
                 </div>
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="icon-sm"
                   aria-label={`حذف ردیف ${index + 1}`}
                   disabled={fields.length === 1}
                   onClick={() => remove(index)}
-                  className="shrink-0 gap-1.5 text-[#94a3b8] hover:bg-[#fbefed] hover:text-[#af6357]"
+                  className="hidden text-muted-foreground hover:bg-destructive/10 hover:text-destructive md:flex"
                 >
-                  <Trash2 size={15} /> حذف
+                  <Trash2 size={15} />
                 </Button>
               </div>
-              <div className="col-span-full min-w-0 md:col-span-1">
-                <Field label="نام آیتم">
-                  <Input
-                    {...register(`items.${index}.name`)}
-                    placeholder="نام محصول / خدمات"
-                  />
-                </Field>
-              </div>
-              <div className="col-span-full min-w-0 md:col-span-1">
-                <Field label="توضیحات">
-                  <Input {...register(`items.${index}.description`)} />
-                </Field>
-              </div>
-              <Field label="تعداد">
-                <Input
-                  {...register(`items.${index}.quantity`, {
-                    valueAsNumber: true,
-                  })}
-                  type="number"
-                  min="0"
-                  step="any"
-                  className="text-left tabular-nums"
-                  dir="ltr"
-                />
-              </Field>
-              <Field label="قیمت واحد">
-                <Input
-                  {...register(`items.${index}.unitPrice`, {
-                    valueAsNumber: true,
-                  })}
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder="۰"
-                  className="text-left tabular-nums"
-                  dir="ltr"
-                />
-              </Field>
-              <div className="col-span-full min-w-0 md:col-span-1">
-                <Field label="قیمت کل">
-                  <output className="flex h-11 w-full items-center justify-between rounded-xl bg-[#f0f9ff] px-3.5 text-sm font-bold tabular-nums text-[#0369a1]">
-                    <span>{formatMoney(quantity * unitPrice)}</span>
-                    <span className="text-xs font-semibold text-[#64748b]">
-                      {currency}
-                    </span>
-                  </output>
-                </Field>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-lg"
-                aria-label={`حذف ردیف ${index + 1}`}
-                disabled={fields.length === 1}
-                onClick={() => remove(index)}
-                className="hidden text-[#94a3b8] hover:bg-[#fbefed] hover:text-[#af6357] md:mt-5 md:flex"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          );
-        })}
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() =>
-          append({ name: "", description: "", quantity: 1, unitPrice: 0 })
-        }
-        className="mt-4 border-dashed border-[#bae6fd] text-[#0284c7] hover:bg-[#f0f9ff]"
-      >
-        <Plus size={16} /> افزودن ردیف
-      </Button>
-      <div className="mt-5 flex items-center justify-between border-t border-[#e0f2fe] pt-4 text-sm">
-        <span className="text-[#64748b]">جمع اقلام</span>
-        <strong className="tabular-nums text-[#334155]">
-          {formatMoney(subtotal)} {currency}
-        </strong>
-      </div>
-    </section>
+            );
+          })}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() =>
+            append({ name: "", description: "", quantity: 1, unitPrice: 0 })
+          }
+          className="mt-3 w-full border-dashed text-primary hover:bg-accent"
+        >
+          <Plus size={16} /> افزودن ردیف
+        </Button>
+        <LedgerRow
+          label="جمع اقلام"
+          className="mt-4 border-t border-border pt-3"
+        >
+          <strong className="tabular-nums text-foreground">
+            {formatMoney(subtotal)} {currency}
+          </strong>
+        </LedgerRow>
+      </SectionBody>
+    </SectionCard>
   );
 }

@@ -73,9 +73,11 @@ function Field({
   className,
   orientation = "vertical",
   ...props
-}: React.ComponentProps<"fieldset"> & VariantProps<typeof fieldVariants>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
   return (
-    <fieldset
+    // biome-ignore lint/a11y/useSemanticElements: shadcn primitive — group container with data-slot hooks.
+    <div
+      role="group"
       data-slot="field"
       data-orientation={orientation}
       className={cn(fieldVariants({ orientation }), className)}
@@ -199,12 +201,10 @@ function FieldError({
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((error, index) => {
-          if (!error?.message) return null;
-          return (
-            <li key={error.message || `error-${index}`}>{error.message}</li>
-          );
-        })}
+        {uniqueErrors.map(
+          (error) =>
+            error?.message && <li key={error.message}>{error.message}</li>,
+        )}
       </ul>
     );
   }, [children, errors]);

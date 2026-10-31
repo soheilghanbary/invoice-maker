@@ -1,3 +1,4 @@
+import { calculateTotals } from "@/components/invoice/model";
 import type {
   InvoiceRecord,
   InvoiceValues,
@@ -32,19 +33,6 @@ function summary(invoice: SavedInvoice): InvoiceRecord {
     currency: invoice.currency,
     createdAt: invoice.createdAt,
   };
-}
-
-function calculateTotal(invoice: InvoiceValues) {
-  const subtotal = invoice.items.reduce(
-    (sum, item) =>
-      sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
-    0,
-  );
-  const taxable = Math.max(
-    0,
-    subtotal - Math.min(subtotal, Math.max(0, Number(invoice.discount) || 0)),
-  );
-  return taxable + (invoice.taxEnabled ? taxable * 0.1 : 0);
 }
 
 function uniqueNumber(
@@ -152,7 +140,6 @@ export async function saveInvoice(
         const payload: InvoiceValues = {
           ...values,
           number: uniqueNumber(values.number, all, id),
-          stampPreview: values.stampPreview,
           discount: Number.isFinite(Number(values.discount))
             ? Math.max(0, Number(values.discount))
             : 0,
@@ -163,7 +150,11 @@ export async function saveInvoice(
           type: payload.type,
           date: payload.date,
           buyerName: payload.buyer.name,
-          total: calculateTotal(payload),
+          total: calculateTotals(
+            payload.items,
+            payload.discount,
+            payload.taxEnabled,
+          ).total,
           currency: payload.currency,
           createdAt: existing?.createdAt ?? new Date().toISOString(),
           payload,

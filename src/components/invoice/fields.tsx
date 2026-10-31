@@ -1,12 +1,14 @@
 "use client";
 
-import { ChevronDown, ReceiptText } from "lucide-react";
+import { cn } from "cn";
+import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { type Control, Controller, useFormContext } from "react-hook-form";
 import {
-  type Control,
-  Controller,
-  type UseFormRegister,
-} from "react-hook-form";
+  SectionBody,
+  SectionCard,
+  SectionHeader,
+} from "@/components/invoice/section-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,20 +23,34 @@ import type { InvoiceValues } from "@/types/invoice";
 export function Field({
   label,
   required,
+  error,
   children,
+  className,
+  labelClassName,
 }: {
   label: string;
   required?: boolean;
+  error?: string;
+  className?: string;
+  labelClassName?: string;
   children: ReactNode;
 }) {
   return (
-    <Label className="flex min-w-0 flex-col items-stretch gap-2 text-[13px] font-semibold text-[#475569]">
-      <span className="leading-5">
-        {label}
-        {required && <span className="mr-1 text-[#0284c7]">*</span>}
-      </span>
-      {children}
-    </Label>
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
+      <Label className="flex-col items-stretch gap-1.5">
+        <span
+          className={cn(
+            "text-[13px] font-medium leading-5 text-muted-foreground",
+            labelClassName,
+          )}
+        >
+          {label}
+          {required && <span className="ms-1 text-destructive">*</span>}
+        </span>
+        {children}
+      </Label>
+      {error && <p className="text-xs leading-5 text-destructive">{error}</p>}
+    </div>
   );
 }
 
@@ -51,38 +67,36 @@ export function SelectField({
 }) {
   return (
     <Field label={label}>
-      <span className="relative">
-        <Controller
-          control={control}
-          name={name}
-          render={({ field }) => (
-            <Select
-              name={field.name}
-              value={field.value}
-              onValueChange={field.onChange}
-              items={options.map((option) => ({
-                label: option,
-                value: option,
-              }))}
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <Select
+            name={field.name}
+            value={field.value}
+            onValueChange={field.onChange}
+            items={options.map((option) => ({
+              label: option,
+              value: option,
+            }))}
+          >
+            <SelectTrigger
+              ref={field.ref}
+              onBlur={field.onBlur}
+              className="w-full text-right"
             >
-              <SelectTrigger
-                ref={field.ref}
-                onBlur={field.onBlur}
-                className="w-full text-right"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {options.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </span>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
     </Field>
   );
 }
@@ -90,12 +104,14 @@ export function SelectField({
 export function PartyFields({
   title,
   name,
-  register,
 }: {
   title: string;
   name: "seller" | "buyer";
-  register: UseFormRegister<InvoiceValues>;
 }) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<InvoiceValues>();
   const fields = [
     {
       key: "name",
@@ -131,61 +147,71 @@ export function PartyFields({
   const additionalFields = fields.slice(2);
 
   const renderFields = (items: (typeof fields)[number][]) => (
-    <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
-      {items.map((field) => (
-        <div
-          key={field.key}
-          className={
-            field.key === "nationalId" || field.key === "economicCode"
-              ? "col-span-1"
-              : "col-span-2 sm:col-span-1"
-          }
-        >
-          <Field
-            label={field.label}
-            required={"required" in field && field.required}
+    <div className="grid gap-x-4 gap-y-4 sm:grid-cols-2">
+      {items.map((field) => {
+        const isName = field.key === "name";
+        const nameError = isName ? errors[name]?.name?.message : undefined;
+        return (
+          <div
+            key={field.key}
+            className={
+              field.key === "nationalId" || field.key === "economicCode"
+                ? "col-span-1"
+                : "col-span-2 sm:col-span-1"
+            }
           >
-            <Input
-              {...register(`${name}.${field.key}` as const)}
-              type={"type" in field ? field.type : "text"}
-              dir={
-                field.key === "address" || field.key === "name" ? "rtl" : "auto"
-              }
-            />
-          </Field>
-        </div>
-      ))}
+            <Field
+              label={field.label}
+              required={"required" in field && field.required}
+              error={nameError}
+            >
+              <Input
+                {...register(`${name}.${field.key}` as const, {
+                  required:
+                    isName && name === "buyer"
+                      ? "نام خریدار را وارد کنید."
+                      : undefined,
+                })}
+                type={"type" in field ? field.type : "text"}
+                aria-invalid={Boolean(nameError)}
+                dir={
+                  field.key === "address" || field.key === "name"
+                    ? "rtl"
+                    : "auto"
+                }
+              />
+            </Field>
+          </div>
+        );
+      })}
     </div>
   );
 
   return (
-    <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7">
-      <div className="mb-6 flex items-center gap-3">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-[#f0f9ff] text-[#0284c7]">
-          <ReceiptText size={17} />
-        </span>
-        <div>
-          <h2 className="text-base font-extrabold text-[#0c4a6e]">{title}</h2>
-          <p className="mt-1 text-xs text-[#64748b]">
-            {name === "seller"
-              ? "اطلاعات روی فاکتور نمایش داده می‌شود و در این مرورگر ذخیره می‌شود"
-              : "اطلاعات روی فاکتور نمایش داده می‌شود"}
-          </p>
-        </div>
-      </div>
-      {renderFields(primaryFields)}
-      <details className="group mt-5">
-        <summary className="flex cursor-pointer select-none list-none items-center gap-2 rounded-lg py-1 text-sm font-bold text-[#0369a1] outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] [&::-webkit-details-marker]:hidden">
-          <span>مشخصات بیشتر</span>
-          <ChevronDown
-            size={17}
-            aria-hidden="true"
-            className="transition-transform group-open:rotate-180 text-[#0369a1]"
-          />
-        </summary>
-        <div className="pt-4">{renderFields(additionalFields)}</div>
-      </details>
-    </section>
+    <SectionCard>
+      <SectionHeader
+        title={title}
+        description={
+          name === "seller"
+            ? "روی فاکتور چاپ می‌شود و در این مرورگر ذخیره می‌شود"
+            : "روی فاکتور چاپ می‌شود"
+        }
+      />
+      <SectionBody>
+        {renderFields(primaryFields)}
+        <details className="group mt-4">
+          <summary className="inline-flex cursor-pointer select-none list-none items-center gap-1 rounded-md py-1 text-sm font-medium text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+            <span>مشخصات بیشتر</span>
+            <ChevronDown
+              size={16}
+              aria-hidden="true"
+              className="text-primary transition-transform group-open:rotate-180"
+            />
+          </summary>
+          <div className="pt-4">{renderFields(additionalFields)}</div>
+        </details>
+      </SectionBody>
+    </SectionCard>
   );
 }
 
@@ -205,19 +231,23 @@ export function InvoicePartyCard({
   ].filter(([, value]) => Boolean(value));
 
   return (
-    <section className="min-w-0 first:pl-4 last:border-r last:border-[#e2e8f0] last:pr-4">
-      <h3 className="text-xs font-bold text-[#0369a1]">{title}</h3>
-      <p className="mt-2 text-sm font-extrabold text-[#0c4a6e]">
+    <section className="min-w-0 rounded-lg border border-[#cbd5e1] p-3.5 print:break-inside-avoid">
+      <h3 className="text-[10px] font-bold text-[#0369a1]">{title}</h3>
+      <p className="mt-1.5 text-sm font-extrabold text-[#0c4a6e]">
         {party.name || "—"}
       </p>
-      <dl className="mt-3 space-y-1.5 text-xs leading-5 text-[#475569]">
-        {details.map(([label, value]) => (
-          <div key={label} className="flex gap-2">
-            <dt className="shrink-0 text-[#64748b]">{label}:</dt>
-            <dd className="min-w-0 wrap-break-word">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      {details.length > 0 && (
+        <dl className="mt-2.5 space-y-1 text-[11px] leading-5">
+          {details.map(([label, value]) => (
+            <div key={label} className="flex gap-2">
+              <dt className="shrink-0 text-[#64748b]">{label}:</dt>
+              <dd className="min-w-0 wrap-break-word text-[#334155]">
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }

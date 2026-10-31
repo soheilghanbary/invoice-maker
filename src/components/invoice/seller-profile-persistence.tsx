@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { type Control, type useForm, useWatch } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { defaultValues } from "@/components/invoice/model";
 import type { InvoiceValues } from "@/types/invoice";
 
+const STORAGE_KEY = "factorino-next-seller-profile";
+
 export function SellerProfilePersistence({
-  control,
-  setValue,
   enabled = true,
 }: {
-  control: Control<InvoiceValues>;
-  setValue: ReturnType<typeof useForm<InvoiceValues>>["setValue"];
   enabled?: boolean;
 }) {
+  const { control, setValue } = useFormContext<InvoiceValues>();
   const seller = useWatch({ control, name: "seller" });
   const stampPreview = useWatch({ control, name: "stampPreview" }) ?? "";
   const [ready, setReady] = useState(false);
@@ -21,9 +20,7 @@ export function SellerProfilePersistence({
   useEffect(() => {
     if (!enabled) return;
     try {
-      const stored = window.localStorage.getItem(
-        "factorino-next-seller-profile",
-      );
+      const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as Partial<
           InvoiceValues["seller"]
@@ -43,12 +40,14 @@ export function SellerProfilePersistence({
   }, [enabled, setValue]);
 
   useEffect(() => {
-    if (enabled && ready && seller) {
+    if (!enabled || !ready || !seller) return;
+    const timeout = window.setTimeout(() => {
       window.localStorage.setItem(
-        "factorino-next-seller-profile",
+        STORAGE_KEY,
         JSON.stringify({ seller, stampPreview }),
       );
-    }
+    }, 400);
+    return () => window.clearTimeout(timeout);
   }, [enabled, ready, seller, stampPreview]);
 
   return null;

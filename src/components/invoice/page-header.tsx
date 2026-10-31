@@ -6,25 +6,23 @@ import { Button } from "@/components/ui/button";
 
 export function InvoiceTopBar() {
   return (
-    <header className="sticky top-0 z-20 border-b border-[#dbeafe] bg-[#f8fbfd]/95 backdrop-blur print:hidden">
-      <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-4 sm:px-8 lg:px-12">
+    <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur print:hidden">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-2.5 text-sm font-extrabold text-[#0c4a6e]"
+          className="inline-flex items-center gap-2.5 text-sm font-bold text-foreground"
         >
-          <span className="flex size-9 items-center justify-center rounded-xl bg-[#0369a1] text-[#bae6fd]">
-            <FileText size={17} />
+          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <FileText size={16} />
           </span>
           فاکتورینو
         </Link>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/invoices"
-            className="text-sm font-semibold text-[#0369a1] hover:text-[#0c4a6e]"
-          >
-            فاکتورهای من
-          </Link>
-        </div>
+        <Link
+          href="/invoices"
+          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          فاکتورهای من
+        </Link>
       </div>
     </header>
   );
@@ -44,37 +42,41 @@ export function InvoicePageIntro({
   downloadDisabled: boolean;
 }) {
   return (
-    <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
       <div>
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1 text-xs font-semibold text-[#64748b] hover:text-[#0369a1]"
+          className="mb-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowRight size={14} /> بازگشت به خانه
         </Link>
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#0c4a6e] sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {isEditing ? "ویرایش فاکتور" : "ساخت فاکتور جدید"}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[#64748b]">
+        <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
           اطلاعات فاکتور را وارد کنید؛ پیش‌نمایش همیشه به‌روز است.
         </p>
       </div>
-      <div className="flex flex-wrap gap-2.5">
-        <Button type="button" size="lg" onClick={onPreview} className="gap-2.5">
-          <FileText size={17} /> پیش‌نمایش و چاپ PDF
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPreview}
+          className="gap-2"
+        >
+          <FileText size={16} /> پیش‌نمایش و چاپ PDF
         </Button>
         <Button
           type="button"
-          size="lg"
           variant="outline"
           onClick={onDownloadPdf}
           disabled={downloadDisabled}
-          className="gap-2.5"
+          className="gap-2"
         >
           {downloadingPdf ? (
-            <LoaderCircle size={17} className="animate-spin" />
+            <LoaderCircle size={16} className="animate-spin" />
           ) : (
-            <Download size={17} />
+            <Download size={16} />
           )}
           {downloadingPdf ? "در حال ساخت PDF…" : "دانلود PDF"}
         </Button>

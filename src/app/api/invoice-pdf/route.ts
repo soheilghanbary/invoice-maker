@@ -1,7 +1,6 @@
 import { type Browser, chromium } from "playwright";
 import type { InvoiceValues } from "@/types/invoice";
 
-// export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const databaseName = "factorino-invoices";
@@ -167,7 +166,8 @@ export async function POST(request: Request) {
         const node = document.querySelector("#invoice-print");
         return Boolean(
           node?.textContent?.trim() &&
-            !document.querySelector("#invoice-app .animate-pulse"),
+            !document.querySelector("#invoice-app .animate-pulse") &&
+            !document.querySelector("#invoice-app .animate-spin"),
         );
       },
       undefined,

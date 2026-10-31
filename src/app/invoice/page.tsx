@@ -11,7 +11,7 @@ export default function InvoicePage({
   searchParams: Promise<{ id?: string; preview?: string }>;
 }) {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[#f0f9ff]" />}>
+    <Suspense fallback={<main className="min-h-screen bg-background" />}>
       <InvoiceData searchParams={searchParams} />
     </Suspense>
   );

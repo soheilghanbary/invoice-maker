@@ -1,12 +1,15 @@
 "use client";
 
-import type { UseFormRegister } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
+import {
+  SectionBody,
+  SectionCard,
+  SectionHeader,
+} from "@/components/invoice/section-card";
 import { StampUploadField } from "@/components/invoice/stamp-upload-field";
 import { Textarea } from "@/components/ui/textarea";
-import type { InvoiceValues } from "@/types/invoice";
 
 export function InvoiceNotesAndStamp({
-  register,
   stampUrl,
   disabled,
   reusable,
@@ -14,7 +17,6 @@ export function InvoiceNotesAndStamp({
   onPendingStampChange,
   onStampUploadingChange,
 }: {
-  register: UseFormRegister<InvoiceValues>;
   stampUrl: string;
   disabled: boolean;
   reusable?: boolean;
@@ -22,19 +24,20 @@ export function InvoiceNotesAndStamp({
   onPendingStampChange: (url: string) => void;
   onStampUploadingChange: (uploading: boolean) => void;
 }) {
+  const { register } = useFormContext();
+
   return (
-    <div className="grid gap-5 md:grid-cols-2">
-      <section className="rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-6">
-        <div className="mb-5">
-          <h2 className="text-base font-extrabold text-[#0c4a6e]">توضیحات</h2>
-          <p className="mt-1 text-xs text-[#64748b]">یادداشت یا شرایط پرداخت</p>
-        </div>
-        <Textarea
-          {...register("notes")}
-          rows={5}
-          placeholder="توضیحات تکمیلی برای خریدار..."
-        />
-      </section>
+    <div className="grid gap-4 md:grid-cols-2">
+      <SectionCard>
+        <SectionHeader title="توضیحات" description="یادداشت یا شرایط پرداخت" />
+        <SectionBody>
+          <Textarea
+            {...register("notes")}
+            rows={5}
+            placeholder="توضیحات تکمیلی برای خریدار..."
+          />
+        </SectionBody>
+      </SectionCard>
       <StampUploadField
         value={stampUrl}
         disabled={disabled}

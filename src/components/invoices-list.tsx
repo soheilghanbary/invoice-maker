@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { formatInvoiceDate, formatMoney } from "@/components/invoice/model";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,26 +24,16 @@ import { Input } from "@/components/ui/input";
 import { deleteInvoice, listInvoices } from "@/lib/invoice-storage";
 import type { InvoiceRecord } from "@/types/invoice";
 
-const numberFormat = new Intl.NumberFormat("fa-IR", {
-  maximumFractionDigits: 0,
-});
-const formatMoney = (value: number) => numberFormat.format(Math.round(value));
 const toLatinDigits = (value: string) =>
   value
     .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
     .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
     .toLocaleLowerCase("fa-IR");
 
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) return value;
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(year, month - 1, day, 12)));
-}
+const formatDate = (value: string) => {
+  const formatted = formatInvoiceDate(value);
+  return formatted === "انتخاب تاریخ" ? value : formatted;
+};
 
 export function InvoicesList() {
   const [query, setQuery] = useState("");
